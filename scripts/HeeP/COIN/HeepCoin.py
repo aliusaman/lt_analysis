@@ -559,6 +559,7 @@ H_raster_x_vs_H_emiss_DATA = ROOT.TH2D("H_raster_x_vs_H_emiss_DATA","Raster_X vs
 H_raster_y_vs_H_pmiss_DATA = ROOT.TH2D("H_raster_y_vs_H_pmiss_DATA","Raster_Y vs pmiss;  pmiss; Raster_Y", 200, -0.1,0.1, 200, -0.05,0.25)
 H_raster_y_vs_H_emiss_DATA = ROOT.TH2D("H_raster_y_vs_H_emiss_DATA","Raster_Y vs emiss;  emiss; Raster_Y", 200, -0.1,0.1, 200, -0.05,0.25)
 H_raster_x_vs_H_raster_y_DATA = ROOT.TH2D("H_raster_x_vs_H_raster_y_DATA","Raster_X vs Raster_Y;  Raster_X; Raster_Y", 200, -0.25,0.25, 200, -0.05,0.25)
+H_raster_y_vs_H_W_DATA = ROOT.TH2D("H_raster_y_vs_H_W_DATA","Raster_Y vs W;  W; Raster_Y", 200, 0.7,1.3, 200, -0.25,0.25)
 
 H_cal_etottracknorm_DATA = ROOT.TH1D("H_cal_etottracknorm_DATA", "HMS Cal etottracknorm", 200, 0.2, 1.8)
 H_cer_npeSum_DATA = ROOT.TH1D("H_cer_npeSum_DATA", "HMS Cer Npe Sum", 200, 0, 30)
@@ -655,7 +656,8 @@ for evt in TBRANCH_DATA:
       H_raster_y_vs_H_pmiss_DATA.Fill(evt.pmiss, evt.raster_y)
       H_raster_y_vs_H_emiss_DATA.Fill(evt.emiss, evt.raster_y)
       H_raster_x_vs_H_raster_y_DATA.Fill(evt.raster_x, evt.raster_y)
-      
+      H_raster_y_vs_H_W_DATA.Fill(evt.W, evt.raster_y)
+
       H_ssxfp_DATA.Fill(evt.ssxfp)
       H_ssyfp_DATA.Fill(evt.ssyfp)
       H_ssxpfp_DATA.Fill(evt.ssxpfp)
@@ -1902,6 +1904,13 @@ H_raster_x_vs_H_raster_y_DATA.Draw("colz")
 
 raster_x_vs_raster_y.Print(outputpdf)
 
+raster_y_vs_W = TCanvas()
+
+raster_y_vs_W.cd()
+H_raster_y_vs_H_W_DATA.Draw("colz")
+
+raster_y_vs_W.Print(outputpdf)
+
 xfp = TCanvas()
 l_xfp = ROOT.TLegend(0.115,0.55,0.33,0.9)
 
@@ -2179,12 +2188,36 @@ b_int_xptar_data_nocut = int(H_ssxptar_DATA_nocut.Integral())
 b_int_xptar_data_nopid = int(H_ssxptar_DATA_nopid.Integral())
 b_int_xptar_dummy = int(H_ssxptar_DUMMY.Integral())
 
+b_mean_xptar_simc = H_ssxptar_SIMC.GetMean()
+b_mean_xptar_data = H_ssxptar_DATA.GetMean()
+b_mean_xptar_data_nocut = H_ssxptar_DATA_nocut.GetMean()
+b_mean_xptar_data_nopid = H_ssxptar_DATA_nopid.GetMean()
+b_mean_xptar_dummy = H_ssxptar_DUMMY.GetMean()
+
+b_mean_xptar_error_simc = H_ssxptar_SIMC.GetMeanError()
+b_mean_xptar_error_data = H_ssxptar_DATA.GetMeanError()
+b_mean_xptar_error_data_nocut = H_ssxptar_DATA_nocut.GetMeanError()
+b_mean_error_xptar_data_nopid = H_ssxptar_DATA_nopid.GetMeanError()
+b_mean_error_xptar_dummy = H_ssxptar_DUMMY.GetMeanError()
+
 l_xptar.AddEntry(H_ssxptar_SIMC,"SIMC, INT = %s" % b_int_xptar_simc)
 l_xptar.AddEntry(H_ssxptar_DATA,"DATA, INT = %s" % b_int_xptar_data)
 if DEBUG:
     l_xptar.AddEntry(H_ssxptar_DATA_nocut,"DATA (no cut), INT = %s" % b_int_xptar_data_nocut)
     l_xptar.AddEntry(H_ssxptar_DATA_nopid,"DATA (no PID cut), INT = %s" % b_int_xptar_data_nopid)
-l_xptar.AddEntry(H_ssxptar_DUMMY,"DUMMY, INT = %s" % b_int_xptar_dummy)
+#l_xptar.AddEntry(H_ssxptar_DUMMY,"DUMMY, INT = %s" % b_int_xptar_dummy)
+l_xptar.AddEntry(H_ssxptar_SIMC,"SIMC, MEAN = {0:.5f}".format(b_mean_xptar_simc))
+l_xptar.AddEntry(H_ssxptar_DATA,"DATA, MEAN = {0:.5f}".format(b_mean_xptar_data))
+if DEBUG:
+    l_xptar.AddEntry(H_ssxptar_DATA_nocut,"DATA (no cut), MEAN = {0:.3f}".format(b_mean_xptar_data_nocut))
+    l_xptar.AddEntry(H_ssxptar_DATA_nopid,"DATA (no PID cut), MEAN = {0:.3f}".format(b_mean_xptar_data_nopid))
+#l_xptar.AddEntry(H_ssxptar_DUMMY,"DUMMY, MEAN = {0:.3f}".format(b_mean_xptar_dummy))
+l_xptar.AddEntry(H_ssxptar_SIMC,"SIMC, Error = {0:.5f}".format(b_mean_xptar_error_simc))
+l_xptar.AddEntry(H_ssxptar_DATA,"DATA, Error = {0:.5f}".format(b_mean_xptar_error_data))
+if DEBUG:
+    l_xptar.AddEntry(H_ssxptar_DATA_nocut,"DATA (no cut), MEAN Error = {0:.4f}".format(b_mean_error_xptar_data_nocut))
+    l_xptar.AddEntry(H_ssxptar_DATA_nopid,"DATA (no PID cut), MEAN Error = {0:.4f}".format(b_mean_error_xptar_data_nopid))
+#l_xptar.AddEntry(H_ssxptar_DUMMY,"DUMMY, MEAN Error = {0:.4f}".format(b_mean_error_xptar_dummy))
 
 l_xptar.Draw()
 
@@ -2243,12 +2276,38 @@ b_int_hxptar_data_nocut = int(H_hsxptar_DATA_nocut.Integral())
 b_int_hxptar_data_nopid = int(H_hsxptar_DATA_nopid.Integral())
 b_int_hxptar_dummy = int(H_hsxptar_DUMMY.Integral())
 
+b_mean_hxptar_simc = H_hsxptar_SIMC.GetMean()
+b_mean_hxptar_data = H_hsxptar_DATA.GetMean()
+b_mean_hxptar_data_nocut = H_hsxptar_DATA_nocut.GetMean()
+b_mean_hxptar_data_nopid = H_hsxptar_DATA_nopid.GetMean()
+b_mean_hxptar_dummy = H_hsxptar_DUMMY.GetMean()
+
+b_mean_error_hxptar_simc = H_hsxptar_SIMC.GetMeanError()
+b_mean_error_hxptar_data = H_hsxptar_DATA.GetMeanError()
+b_mean_error_hxptar_data_nocut = H_hsxptar_DATA_nocut.GetMeanError()
+b_mean_error_hxptar_data_nopid = H_hsxptar_DATA_nopid.GetMeanError()
+b_mean_error_hxptar_dummy = H_hsxptar_DUMMY.GetMeanError()
+
 l_hxptar.AddEntry(H_hsxptar_SIMC,"SIMC, INT = %s" % b_int_hxptar_simc)
 l_hxptar.AddEntry(H_hsxptar_DATA,"DATA, INT = %s" % b_int_hxptar_data)
 if DEBUG:
     l_hxptar.AddEntry(H_hsxptar_DATA_nocut,"DATA (no cut), INT = %s" % b_int_hxptar_data_nocut)
     l_hxptar.AddEntry(H_hsxptar_DATA_nopid,"DATA (no PID cut), INT = %s" % b_int_hxptar_data_nopid)
-l_hxptar.AddEntry(H_hsxptar_DUMMY,"DUMMY, INT = %s" % b_int_hxptar_dummy)
+#l_hxptar.AddEntry(H_hsxptar_DUMMY,"DUMMY, INT = %s" % b_int_hxptar_dummy)
+
+l_hxptar.AddEntry(H_hsxptar_SIMC,"SIMC, Error = {0:.5f}".format(b_mean_error_hxptar_simc))
+l_hxptar.AddEntry(H_hsxptar_DATA,"DATA, Error = {0:.5f}".format(b_mean_error_hxptar_data))
+if DEBUG:
+    l_hxptar.AddEntry(H_hsxptar_DATA_nocut,"DATA (no cut), MEAN Error = {0:.4f}".format(b_mean_error_hxptar_data_nocut))
+    l_hxptar.AddEntry(H_hsxptar_DATA_nopid,"DATA (no PID cut), MEAN Error = {0:.4f}".format(b_mean_error_hxptar_data_nopid))
+#l_hxptar.AddEntry(H_hsxptar_DUMMY,"DUMMY, MEAN Error = {0:.4f}".format(b_mean_error_hxptar_dummy)
+
+l_hxptar.AddEntry(H_hsxptar_SIMC,"SIMC, MEAN = {0:.5f}".format(b_mean_hxptar_simc))
+l_hxptar.AddEntry(H_hsxptar_DATA,"DATA, MEAN = {0:.5f}".format(b_mean_hxptar_data))
+if DEBUG:
+    l_hxptar.AddEntry(H_hsxptar_DATA_nocut,"DATA (no cut), MEAN = {0:.3f}".format(b_mean_hxptar_data_nocut))
+    l_hxptar.AddEntry(H_hsxptar_DATA_nopid,"DATA (no PID cut), MEAN = {0:.3f}".format(b_mean_hxptar_data_nopid))
+#l_hxptar.AddEntry(H_hsxptar_DUMMY,"DUMMY, MEAN = {0:.3f}".format(b_mean_hxptar_dummy)
 
 l_hxptar.Draw()
 
