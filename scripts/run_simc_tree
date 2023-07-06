@@ -39,9 +39,19 @@ $1
 endofinput
 cd ${SIMCPATH}
 mv worksim/$1.root OUTPUTS
+<<<<<<< HEAD
 cd recon_hcana/
 if [[ $2 -eq "" ]]; then
     echo "No reaction provided, assuming heep" 
     $reaction="heep"
 fi	
 root 'recon_hcana.C("Heep_Coin_4p9", "heep" )'
+=======
+
+cd recon_hcana/
+if [[ $2 -eq "" ]]; then
+    echo "No reaction provided, assuming heep" 
+    REACTION="heep"
+fi
+root "recon_hcana.C(\"$1\", \"$REACTION\" )"
+>>>>>>> upstream/winter_2023

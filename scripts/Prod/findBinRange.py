@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2023-03-24 15:29:31 trottar"
+# Time-stamp: "2023-05-30 21:13:59 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -31,8 +31,8 @@ from functools import reduce
 ##################################################################################################################################################
 # Check the number of arguments provided to the script
 
-if len(sys.argv)-1!=24:
-    print("!!!!! ERROR !!!!!\n Expected 24 arguments\n Usage is with - KIN W Q2 EPSVAL OutDATAFilename OutDUMMYFilename OutFullAnalysisFilename tmin tmax NumtBins NumPhiBins runNumRight runNumLeft runNumCenter data_charge_right data_charge_left data_charge_center dummy_charge_right dummy_charge_left dummy_charge_center InData_efficiency_right InData_efficiency_left InData_efficiency_center efficiency_table\n!!!!! ERROR !!!!!")
+if len(sys.argv)-1!=25:
+    print("!!!!! ERROR !!!!!\n Expected 25 arguments\n Usage is with - KIN W Q2 EPSVAL OutDATAFilename OutDUMMYFilename OutFullAnalysisFilename tmin tmax NumtBins NumPhiBins runNumRight runNumLeft runNumCenter data_charge_right data_charge_left data_charge_center dummy_charge_right dummy_charge_left dummy_charge_center InData_efficiency_right InData_efficiency_left InData_efficiency_center efficiency_table ParticleType\n!!!!! ERROR !!!!!")
     sys.exit(1)
 
 ##################################################################################################################################################    
@@ -64,8 +64,7 @@ InData_efficiency_right = sys.argv[21]
 InData_efficiency_left = sys.argv[22]
 InData_efficiency_center = sys.argv[23]
 efficiency_table = sys.argv[24]
-
-particle = "kaon"
+ParticleType = sys.argv[25]
 
 inpDict = {
     "kinematics" : kinematics,
@@ -92,7 +91,7 @@ inpDict = {
     "InData_efficiency_left" : InData_efficiency_left,
     "InData_efficiency_center" : InData_efficiency_center,
     "efficiency_table" : efficiency_table,
-    "particle" : particle,
+    "ParticleType" : ParticleType,
 }
 
 ###############################################################################################################################################
@@ -119,9 +118,9 @@ LTANAPATH=lt.LTANAPATH
 ANATYPE=lt.ANATYPE
 OUTPATH=lt.OUTPATH
 
-foutname = OUTPATH+"/" + OutFilename + ".root"
-fouttxt  = OUTPATH+"/" + OutFilename + ".txt"
-outputpdf  = OUTPATH+"/" + OutFilename + ".pdf"
+foutname = OUTPATH + "/" + ParticleType + "_" + OutFilename + ".root"
+fouttxt  = OUTPATH + "/" + ParticleType + "_" + OutFilename + ".txt"
+outputpdf  = OUTPATH + "/" + ParticleType + "_" + OutFilename + ".pdf"
 
 ################################################################################################################################################
 '''
@@ -148,13 +147,7 @@ def bin_data(histlist):
     for i,hist in enumerate(histlist):
         if hist["phi_setting"] == 'Right':
             InFile_RIGHT_DATA = hist["InFile_DATA"]
-            #TBRANCH_RIGHT_DATA  = InFile_RIGHT_DATA.Get("Uncut_Kaon_Events")
-            #TBRANCH_RIGHT_DATA  = InFile_RIGHT_DATA.Get("Cut_Kaon_Events_all_noRF")
-            #TBRANCH_RIGHT_DATA  = InFile_RIGHT_DATA.Get("Cut_Kaon_Events_prompt_noRF")
-            #TBRANCH_RIGHT_DATA  = InFile_RIGHT_DATA.Get("Cut_Kaon_Events_rand_noRF")
-            #TBRANCH_RIGHT_DATA  = InFile_RIGHT_DATA.Get("Cut_Kaon_Events_all_RF")
-            TBRANCH_RIGHT_DATA  = InFile_RIGHT_DATA.Get("Cut_Kaon_Events_prompt_RF")
-            #TBRANCH_RIGHT_DATA  = InFile_RIGHT_DATA.Get("Cut_Kaon_Events_rand_RF")
+            TBRANCH_RIGHT_DATA  = InFile_RIGHT_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
             print("\nCreating right t-bin histogram...")
             # Grab t bin range
             H_list_Right = [(-evt.MandelT,(evt.ph_q+math.pi)*(180/math.pi)) for i,evt in enumerate(TBRANCH_RIGHT_DATA) if (tmin <= -evt.MandelT <= tmax)]
@@ -163,13 +156,7 @@ def bin_data(histlist):
 
         if hist["phi_setting"] == 'Left':
             InFile_LEFT_DATA = hist["InFile_DATA"]
-            #TBRANCH_LEFT_DATA  = InFile_LEFT_DATA.Get("Uncut_Kaon_Events")
-            #TBRANCH_LEFT_DATA  = InFile_LEFT_DATA.Get("Cut_Kaon_Events_all_noRF")
-            #TBRANCH_LEFT_DATA  = InFile_LEFT_DATA.Get("Cut_Kaon_Events_prompt_noRF")
-            #TBRANCH_LEFT_DATA  = InFile_LEFT_DATA.Get("Cut_Kaon_Events_rand_noRF")
-            #TBRANCH_LEFT_DATA  = InFile_LEFT_DATA.Get("Cut_Kaon_Events_all_RF")
-            TBRANCH_LEFT_DATA  = InFile_LEFT_DATA.Get("Cut_Kaon_Events_prompt_RF")
-            #TBRANCH_LEFT_DATA  = InFile_LEFT_DATA.Get("Cut_Kaon_Events_rand_RF")
+            TBRANCH_LEFT_DATA  = InFile_LEFT_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
             print("\nCreating left t-bin histogram...")
             # Grab t bin range
             H_list_Left = [(-evt.MandelT,(evt.ph_q+math.pi)*(180/math.pi)) for i,evt in enumerate(TBRANCH_LEFT_DATA) if (tmin <= -evt.MandelT <= tmax)]
@@ -178,13 +165,7 @@ def bin_data(histlist):
             
         if hist["phi_setting"] == 'Center':
             InFile_CENTER_DATA = hist["InFile_DATA"]
-            #TBRANCH_CENTER_DATA  = InFile_CENTER_DATA.Get("Uncut_Kaon_Events")
-            #TBRANCH_CENTER_DATA  = InFile_CENTER_DATA.Get("Cut_Kaon_Events_all_noRF")
-            #TBRANCH_CENTER_DATA  = InFile_CENTER_DATA.Get("Cut_Kaon_Events_prompt_noRF")
-            #TBRANCH_CENTER_DATA  = InFile_CENTER_DATA.Get("Cut_Kaon_Events_rand_noRF")
-            #TBRANCH_CENTER_DATA  = InFile_CENTER_DATA.Get("Cut_Kaon_Events_all_RF")
-            TBRANCH_CENTER_DATA  = InFile_CENTER_DATA.Get("Cut_Kaon_Events_prompt_RF")
-            #TBRANCH_CENTER_DATA  = InFile_CENTER_DATA.Get("Cut_Kaon_Events_rand_RF")
+            TBRANCH_CENTER_DATA  = InFile_CENTER_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
             print("\nCreating center t-bin histogram...")
             # Grab t bin range
             H_list_Center = [(-evt.MandelT,(evt.ph_q+math.pi)*(180/math.pi)) for i,evt in enumerate(TBRANCH_CENTER_DATA) if (tmin <= -evt.MandelT <= tmax)]
@@ -271,14 +252,20 @@ histlist = []
 for phiset in phisetlist:
     histlist.append(defineHists(phiset,inpDict))
 
+print("$$$$$$$$$$$$$$$$$$$",type(histlist[0]))
+    
 print("\n\n")
 
 settingList = []
-for i,hist in enumerate(histlist):
+for i,hist in enumerate(histlist):    
     if not bool(hist): # If hist is empty
         histlist.remove(hist)
     else:
         settingList.append(hist["phi_setting"])
+
+for i,hist in enumerate(histlist):
+    print("!!!!!!!!!!!!!!!!!!!!!!!!! MM", type(hist["H_MM_DATA"]), hist["H_MM_DATA"])
+    print("!!!!!!!!!!!!!!!!!!!!!!!!! tbins", type(hist["H_tbins_DATA"]), hist["H_tbins_DATA"])
         
 eff_plt = TCanvas()
 G_eff_plt = ROOT.TMultiGraph()
@@ -313,7 +300,10 @@ for i,hist in enumerate(histlist):
 
 l_eff_plt.Draw()
 
-eff_plt.Print(outputpdf + '(')
+if ParticleType == "kaon":
+    eff_plt.Print(outputpdf)
+else:
+    eff_plt.Print(outputpdf + '(')
 
 c_bins = TCanvas()
 
@@ -337,8 +327,6 @@ tbinedges = binned_t[1]
 phibinedges = binned_phi[1]
 
 for i,hist in enumerate(histlist):
-    
-
     for j in range(NumtBins):
         for k in range(NumPhiBins):
             hist["H_tbins_DATA"].Fill((tbinedges[j]+tbinedges[j+1])/2)
@@ -363,13 +351,7 @@ c_yield_data = TCanvas()
 for i,hist in enumerate(histlist):
 
     InFile_DATA = hist["InFile_DATA"]
-    #TBRANCH_DATA  = InFile_DATA.Get("Uncut_Kaon_Events")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_all_noRF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_prompt_noRF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_rand_noRF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_all_RF")
-    TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_prompt_RF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_rand_RF")
+    TBRANCH_DATA  = InFile_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
 
     mm_list = []
     aver_lst = []
@@ -555,13 +537,7 @@ c_Q2tbin.Divide(3, int(NumtBins/2))
 for i,hist in enumerate(histlist):
 
     InFile_DATA = hist["InFile_DATA"]
-    #TBRANCH_DATA  = InFile_DATA.Get("Uncut_Kaon_Events")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_all_noRF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_prompt_noRF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_rand_noRF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_all_RF")
-    TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_prompt_RF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_rand_RF")
+    TBRANCH_DATA  = InFile_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
 
     aver_lst = []
     for evt in TBRANCH_DATA:
@@ -599,13 +575,7 @@ c_Wtbin.Divide(3, int(NumtBins/2))
 for i,hist in enumerate(histlist):
 
     InFile_DATA = hist["InFile_DATA"]
-    #TBRANCH_DATA  = InFile_DATA.Get("Uncut_Kaon_Events")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_all_noRF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_prompt_noRF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_rand_noRF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_all_RF")
-    TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_prompt_RF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_rand_RF")
+    TBRANCH_DATA  = InFile_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
 
     aver_lst = []
     for evt in TBRANCH_DATA:
@@ -643,13 +613,7 @@ c_ttbin.Divide(3, int(NumtBins/2))
 for i,hist in enumerate(histlist):
 
     InFile_DATA = hist["InFile_DATA"]
-    #TBRANCH_DATA  = InFile_DATA.Get("Uncut_Kaon_Events")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_all_noRF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_prompt_noRF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_rand_noRF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_all_RF")
-    TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_prompt_RF")
-    #TBRANCH_DATA  = InFile_DATA.Get("Cut_Kaon_Events_rand_RF")
+    TBRANCH_DATA  = InFile_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
 
     aver_lst = []
     for evt in TBRANCH_DATA:
@@ -721,13 +685,13 @@ c_pid.Draw()
 
 c_pid.Print(outputpdf)
 
-ct_ek = TCanvas()
+ct = TCanvas()
 
 for i,hist in enumerate(histlist):
-    hist["H_ct_ek_DATA"].SetLineColor(i+1)
-    hist["H_ct_ek_DATA"].Draw("same, E1")
+    hist["H_ct_DATA"].SetLineColor(i+1)
+    hist["H_ct_DATA"].Draw("same, E1")
 
-ct_ek.Print(outputpdf)
+ct.Print(outputpdf)
 
 
 CQ2 = TCanvas()
@@ -1345,7 +1309,7 @@ for i,hist in enumerate(histlist):
     hist["H_pmx_DATA"].Write()
     hist["H_pmy_DATA"].Write()
     hist["H_pmz_DATA"].Write()
-    hist["H_ct_ek_DATA"].Write()
+    hist["H_ct_DATA"].Write()
     for b in range(NumtBins):
         hist["H_Q2_tbin_DATA_{}".format(b+1)].Write()
         hist["H_W_tbin_DATA_{}".format(b+1)].Write()
@@ -1398,6 +1362,11 @@ for i,hist in enumerate(histlist):
     hist["InFile_DATA"].Close()
     hist["InFile_DUMMY"].Close()
     hist["InFile_SIMC"].Close()
+    if ParticleType == "kaon":
+        hist["InFile_SUBPION_DATA"].Close()
+        hist["InFile_SUBPION_DUMMY"].Close()
+        hist["InFile_SUBPROTON_DATA"].Close()
+        hist["InFile_SUBPROTON_DUMMY"].Close()
 
 print ("Processing Complete")
 
