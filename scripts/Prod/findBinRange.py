@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2023-05-30 21:13:59 trottar"
+# Time-stamp: "2023-07-07 13:07:33 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -251,8 +251,6 @@ phisetlist = ["Center","Left","Right"]
 histlist = []
 for phiset in phisetlist:
     histlist.append(defineHists(phiset,inpDict))
-
-print("$$$$$$$$$$$$$$$$$$$",type(histlist[0]))
     
 print("\n\n")
 
@@ -263,9 +261,27 @@ for i,hist in enumerate(histlist):
     else:
         settingList.append(hist["phi_setting"])
 
+relYieldPlot = plt.figure(figsize=(12,8))
+
+#HMS plot scaler
+plt.grid(zorder=1)
+plt.xlim(0,70)
+#plt.ylim(0.925,1.075)
+plt.plot([0,70], [1,1], 'r-',zorder=2)
+
 for i,hist in enumerate(histlist):
-    print("!!!!!!!!!!!!!!!!!!!!!!!!! MM", type(hist["H_MM_DATA"]), hist["H_MM_DATA"])
-    print("!!!!!!!!!!!!!!!!!!!!!!!!! tbins", type(hist["H_tbins_DATA"]), hist["H_tbins_DATA"])
+    print("\n\n\n\n\n\n\n",hist.keys(),"\n\n\n\n\n\n\n")
+    plt.errorbar(hist["current"],hist["yieldRel_HMS_scaler"], \
+                 yerr=hist["yieldRel_HMS_scaler"]*hist["uncern_yieldRel_HMS_scaler"], \
+                 color='black',linestyle='None',zorder=3,label="_nolegend_")
+    plt.scatter(hist["current"],hist["yieldRel_HMS_scaler"],color='blue',zorder=4,label="_nolegend_")
+    plt.title('HMS LH2 %s-%s' % (int(min(hist["run number"])),int(max(hist["run number"]))), fontsize =16)
+
+plt.ylabel('Rel. Yield Scaler', fontsize=16)
+plt.xlabel('Current [uA]', fontsize =16)
+plt.legend()
+plt.show()
+
         
 eff_plt = TCanvas()
 G_eff_plt = ROOT.TMultiGraph()

@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2023-05-30 21:37:43 trottar"
+# Time-stamp: "2023-07-07 12:52:55 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -47,6 +47,10 @@ UTILPATH=lt.UTILPATH
 LTANAPATH=lt.LTANAPATH
 ANATYPE=lt.ANATYPE
 OUTPATH=lt.OUTPATH
+
+################################################################################################################################################
+
+from scaler_lumi import scaler
 
 ################################################################################################################################################
 
@@ -2424,17 +2428,53 @@ def defineHists(phi_setting, inpDict):
         histDict["Q2_vs_W_DATA"] = Q2_vs_W_DATA
         histDict["yieldDictData"] = {}
         histDict["yieldDictSimc"] = {}
+
+        #################
+        # HARD CODED
+        #################
+        
+        from collections import defaultdict
+        lumi_dicts = []
+        for run in runNums.split(' '):
+            with up.open("/group/c-kaonlt/USERS/trottar/hallc_replay_lt/ROOTfiles/Analysis/KaonLT/Kaon_coin_replay_production_%s_-1.root" % run ) as lumi_f:
+                lumi_dicts.append(scaler(run, lumi_f["TSP"]))
+
+        combined_dict = defaultdict(list)
+        for d in lumi_dicts:
+            for key, val in d.items():
+                combined_dict[key].append(val)
+                
+        hist = dict(combined_dict)
+                
+        # Define relative yield relative to minimum current
+        curr_tmp_hms = 0
+        for i,curr in enumerate(hist["current"]):
+            if len(hist["current"]) <= 1:
+                min_curr_hms = hist["current"][i]
+                break
+            if curr_tmp_hms >= curr or curr_tmp_hms == 0:
+                min_curr_hms = hist["current"][i]
+                curr_tmp_hms = curr
+
+        # Define relative yield relative to minimum current
+        for i,curr in enumerate(hist["current"]):
+            if curr ==  min_curr_hms:
+                min_yield_HMS_scaler = hist["yield_HMS_scaler"][i]
+        hist.update({"min_yield_HMS_scaler" : min_yield_HMS_scaler})
+        hist.update({"yieldRel_HMS_scaler": hist["yield_HMS_scaler"] / min_yield_HMS_scaler})
+                
+
+        histDict.update(hist)
+
+        print("\n\n\n\n\n\n\n",histDict['current'],"\n\n\n\n\n\n\n")
+        
+        #################
+        #################
+        #################
+        
         
         # Add t-binned histograms to dictionary
         histDict.update(tbinDict)
-
-        for key,val in histDict.items():
-            if val == H_MM_DATA:
-                if isinstance(val, ROOT.TH1D):
-                    print("##### key->", key, " val->", type(val), val.Print())
-            if val == H_tbins_DATA:
-                if isinstance(val, ROOT.TH1D):
-                    print("##### key->", key, " val->", type(val), val.Print())
 
 
         ###
@@ -2543,11 +2583,7 @@ def defineHists(phi_setting, inpDict):
         cmm.Print(outputpdf.replace("kaon_","{}_kaon_MM_subtract_".format(phi_setting))+')')
         cmm.Print(outputpdf+'(')
         
-        print("@@@@@@@@@@@",histDict["H_tbins_DATA"])
-        
-        print("$$$$$$$$$$$$$$$$$$$",type(H_tbins_DATA))
         return histDict
-        #return H_tbins_DATA
         
     else:    
 
