@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2023-07-07 13:07:33 trottar"
+# Time-stamp: "2023-07-25 03:31:11 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -22,6 +22,7 @@ import scipy
 import scipy.integrate as integrate
 from scipy.integrate import quad
 import matplotlib.pyplot as plt
+from collections import defaultdict
 import sys, math, os, subprocess
 from array import array
 from ROOT import TCanvas, TColor, TGaxis, TH1F, TH2F, TPad, TStyle, gStyle, gPad, TGaxis, TLine, TMath, TPaveText, TArc, TGraphPolar, TLatex, TH2Poly
@@ -131,64 +132,84 @@ from subtraction import defineHists
 
 ################################################################################################################################################
 
+'''
+# Convert TH1F to NumPy array
+def hist_to_numpy(histogram):
+    # Convert the histogram data to a NumPy array
+    hist_values, bin_edges = rnp.hist2array(histogram,return_edges=True)
+    # Check if bin_edges is a list of lists, and flatten it if necessary
+    if isinstance(bin_edges[0], (list, np.ndarray)):
+        bin_edges = np.concatenate(bin_edges)    
+    # Convert bin_edges to a NumPy array
+    bin_edges = np.array(bin_edges)
+    bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+    return bin_centers
+'''
+
+# Convert TH1F to NumPy array
+def hist_to_numpy(histogram, data):
+    
+    # Convert the histogram data to a NumPy array
+    events, edges = rnp.hist2array(histogram,return_edges=True)
+
+    # Convert to a float array explicitly
+    #edges = np.array(edges, dtype=float)[0]
+    #events = np.array(events, dtype=float)
+    edges = edges[0]
+    events = data
+    
+    # Get the histogram values and bin bin_edges
+    hist_values, bin_edges = np.histogram(events, bins=edges)
+    
+    # Create a 1D dataset (array) representing the event distribution bin-to-bin
+    event_distribution = np.repeat(bin_edges[:-1], hist_values)
+    
+    return event_distribution
+
 def bin_data(histlist):
 
     ################################################################################################################################################
     # Define root file trees of interest
 
-    H_t_Right = []
-    H_t_Left = []
-    H_t_Center = []
+    # Initialize NumPy arrays
+    H_t_Right = np.array([])
+    H_t_Left = np.array([])
+    H_t_Center = np.array([])
 
-    H_phi_Right = []
-    H_phi_Left = []
-    H_phi_Center = []
+    H_phi_Right = np.array([])
+    H_phi_Left = np.array([])
+    H_phi_Center = np.array([])
     
     for i,hist in enumerate(histlist):
+        
+        t = hist_to_numpy(hist["H_t_DATA"], hist["arr_t_DATA"])
+        phi = hist_to_numpy(hist["H_ph_q_DATA"], hist["arr_phi_DATA"]) + math.pi
+        phi_deg = phi * (180 / math.pi)        
+        
         if hist["phi_setting"] == 'Right':
-            InFile_RIGHT_DATA = hist["InFile_DATA"]
-            TBRANCH_RIGHT_DATA  = InFile_RIGHT_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
             print("\nCreating right t-bin histogram...")
-            # Grab t bin range
-            H_list_Right = [(-evt.MandelT,(evt.ph_q+math.pi)*(180/math.pi)) for i,evt in enumerate(TBRANCH_RIGHT_DATA) if (tmin <= -evt.MandelT <= tmax)]
-            H_t_Right = [t[0] for t in H_list_Right]
-            H_phi_Right = [t[1] for t in H_list_Right]
+            H_t_Right = np.append(H_t_Right, t)
+            H_phi_Right = np.append(H_phi_Right, phi_deg)
 
-        if hist["phi_setting"] == 'Left':
-            InFile_LEFT_DATA = hist["InFile_DATA"]
-            TBRANCH_LEFT_DATA  = InFile_LEFT_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
+        elif hist["phi_setting"] == 'Left':
             print("\nCreating left t-bin histogram...")
-            # Grab t bin range
-            H_list_Left = [(-evt.MandelT,(evt.ph_q+math.pi)*(180/math.pi)) for i,evt in enumerate(TBRANCH_LEFT_DATA) if (tmin <= -evt.MandelT <= tmax)]
-            H_t_Left = [t[0] for t in H_list_Left]
-            H_phi_Left = [t[1] for t in H_list_Left]
-            
-        if hist["phi_setting"] == 'Center':
-            InFile_CENTER_DATA = hist["InFile_DATA"]
-            TBRANCH_CENTER_DATA  = InFile_CENTER_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
+            H_t_Left = np.append(H_t_Left, t)
+            H_phi_Left = np.append(H_phi_Left, phi_deg)
+
+        elif hist["phi_setting"] == 'Center':
             print("\nCreating center t-bin histogram...")
-            # Grab t bin range
-            H_list_Center = [(-evt.MandelT,(evt.ph_q+math.pi)*(180/math.pi)) for i,evt in enumerate(TBRANCH_CENTER_DATA) if (tmin <= -evt.MandelT <= tmax)]
-            H_t_Center = [t[0] for t in H_list_Center]
-            H_phi_Center = [t[1] for t in H_list_Center]
-            
+            H_t_Center = np.append(H_t_Center, t)
+            H_phi_Center = np.append(H_phi_Center, phi_deg)
+
     ################################################################################################################################################
 
-    H_t_BinTest = []
-    H_phi_BinTest = []
-    for val in settingList:
-        if val == "Right":
-            H_t_BinTest = np.concatenate((H_t_BinTest, H_t_Right))
-            H_phi_BinTest = np.concatenate((H_phi_BinTest, H_phi_Right))
-        if val == "Left":
-            H_t_BinTest = np.concatenate((H_t_BinTest, H_t_Left))
-            H_phi_BinTest = np.concatenate((H_phi_BinTest, H_phi_Left))
-        if val == "Center":
-            H_t_BinTest = np.concatenate((H_t_BinTest, H_t_Center))
-            H_phi_BinTest = np.concatenate((H_phi_BinTest, H_phi_Center))
-            
-    return [find_phibins(H_phi_BinTest), find_tbins(H_t_BinTest)]
+    # Concatenate the H_t arrays for Right, Left, and Center
+    H_t_BinTest = np.concatenate((H_t_Right, H_t_Left, H_t_Center))
 
+    # Concatenate the H_phi arrays for Right, Left, and Center
+    H_phi_BinTest = np.concatenate((H_phi_Right, H_phi_Left, H_phi_Center))
+        
+    return [find_phibins(H_phi_BinTest), find_tbins(H_t_BinTest)]
 
 def find_phibins(H_phi_BinTest):
 
@@ -261,27 +282,33 @@ for i,hist in enumerate(histlist):
     else:
         settingList.append(hist["phi_setting"])
 
-#relYieldPlot = plt.figure(figsize=(12,8))
+#################
+# HARD CODED
+#################
+if ParticleType == "kaon":
+    relYieldPlot = plt.figure(figsize=(12,8))
 
-#HMS plot scaler
-#plt.grid(zorder=1)
-#plt.xlim(0,70)
-#plt.ylim(0.925,1.075)
-#plt.plot([0,70], [1,1], 'r-',zorder=2)
+    #HMS plot scaler
+    plt.grid(zorder=1)
+    plt.xlim(0,70)
+    #plt.ylim(0.925,1.075)
+    plt.plot([0,70], [1,1], 'r-',zorder=2)
 
-#for i,hist in enumerate(histlist):
-#    print("\n\n\n\n\n\n\n",hist.keys(),"\n\n\n\n\n\n\n")
-#    plt.errorbar(hist["current"],hist["yieldRel_HMS_scaler"], \
-#                 yerr=hist["yieldRel_HMS_scaler"]*hist["uncern_yieldRel_HMS_scaler"], \
-#                 color='black',linestyle='None',zorder=3,label="_nolegend_")
-#    plt.scatter(hist["current"],hist["yieldRel_HMS_scaler"],color='blue',zorder=4,label="_nolegend_")
-#    plt.title('HMS LH2 %s-%s' % (int(min(hist["run number"])),int(max(hist["run number"]))), fontsize =16)
+    for i,hist in enumerate(histlist):
+        plt.errorbar(hist["current"],hist["yieldRel_HMS_scaler"], \
+                     yerr=hist["yieldRel_HMS_scaler"]*hist["uncern_yieldRel_HMS_scaler"], \
+                     color='black',linestyle='None',zorder=3,label="_nolegend_")
+        plt.scatter(hist["current"],hist["yieldRel_HMS_scaler"],color='blue',zorder=4,label="_nolegend_")
+        plt.title('HMS LH2 %s-%s' % (int(min(hist["run number"])),int(max(hist["run number"]))), fontsize =16)
 
-#plt.ylabel('Rel. Yield Scaler', fontsize=16)
-#plt.xlabel('Current [uA]', fontsize =16)
-#plt.legend()
-#plt.show()
+    plt.ylabel('Rel. Yield Scaler', fontsize=16)
+    plt.xlabel('Current [uA]', fontsize =16)
+    plt.legend()
+    #plt.show()
 
+#################
+#################
+#################
         
 eff_plt = TCanvas()
 G_eff_plt = ROOT.TMultiGraph()
@@ -363,66 +390,74 @@ for i,hist in enumerate(histlist):
 c_bins.Print(outputpdf)
         
 c_yield_data = TCanvas()
-        
-for i,hist in enumerate(histlist):
 
-    InFile_DATA = hist["InFile_DATA"]
-    TBRANCH_DATA  = InFile_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
+# Initialize NumPy arrays before the loop
+t = np.array([])
+phi = np.array([])
+phi_deg = np.array([])
+Q2 = np.array([])
+W = np.array([])
+MM = np.array([])
 
-    mm_list = []
-    aver_lst = []
-    for evt in TBRANCH_DATA:
-        for j in range(len(tbinedges) - 1):
-            if tbinedges[j] <= -evt.MandelT < tbinedges[j+1]:
-                tbin_index = j
-            else:
-                tbin_index = None
-            if tbin_index != None:
-                aver_lst.append((tbin_index, evt.Q2, evt.W, -evt.MandelT))
-                for k in range(len(phibinedges) - 1):                    
-                    if phibinedges[k] <= (evt.ph_q+math.pi)*(180/math.pi) < phibinedges[k+1]:
-                        phibin_index = k
-                    else:
-                        phibin_index = None
-                    if phibin_index != None:
-                        mm_list.append((tbin_index, phibin_index, np.sqrt(pow(evt.emiss, 2) - pow(evt.pmiss, 2))))
+for hist in histlist:
+    
+    # Convert to NumPy arrays
+    t = np.append(t, hist_to_numpy(hist["H_t_DATA"], hist["arr_t_DATA"]))
+    phi = np.append(phi, hist_to_numpy(hist["H_ph_q_DATA"], hist["arr_phi_DATA"]) + math.pi)
+    phi_deg = np.append(phi_deg, phi * (180 / math.pi))
+    Q2 = np.append(Q2, hist_to_numpy(hist["H_Q2_DATA"], hist["arr_Q2_DATA"]))
+    W = np.append(W, hist_to_numpy(hist["H_W_DATA"], hist["arr_W_DATA"]))
+    MM = np.append(MM, hist_to_numpy(hist["H_MM_DATA"], hist["arr_MM_DATA"])) 
 
-    groups = {}
-    # Group the tuples by the first two elements using a dictionary
-    for t in aver_lst:
-        key = (t[0])
-        if key in groups:
-            groups[key].append((t[1], t[2], t[3]))
-        else:
-            groups[key] = [(t[1], t[2], t[3])]
+# Initialize NumPy arrays
+aver_lst = []
+mm_lst = []
+for j in range(len(tbinedges) - 1):
+    tbin_indices = np.where((tbinedges[j] <= t) & (t < tbinedges[j + 1]))[0]
+    if len(tbin_indices) > 0:
+        tbin_index = j
+        Q2_val = Q2[tbin_indices]
+        W_val = W[tbin_indices]
+        t_val = t[tbin_indices]
+        # Append tbin_index, Q2, W, and t to aver_lst
+        aver_lst.append((tbin_index, Q2_val, W_val, t_val))
+        for k in range(len(phibinedges) - 1):
+            phibin_indices = np.where((phibinedges[k] <= phi_deg) & (phi_deg < phibinedges[k + 1]))[0]
+            if len(phibin_indices) > 0:
+                phibin_index = k
+                # t binning
+                #MM_val = MM[tbin_indices]
+                # t+phi binning
+                # Combine tbin_indices and phibin_indices using logical AND
+                combined_indices = np.intersect1d(tbin_indices, phibin_indices)
+                MM_val = MM[combined_indices]
+                mm_lst.append((tbin_index, phibin_index, MM_val))
 
-    # Extract the desired values from each group
-    Q2_aver = []
-    W_aver = []
-    t_aver = []
-    for key, val in groups.items():
-        Q2_tmp = []
-        W_tmp = []
-        t_tmp = []
-        for tup in val:
-            Q2_tmp.append(tup[0])
-            W_tmp.append(tup[1])
-            t_tmp.append(tup[2])
-        Q2_aver.append((key, np.average(Q2_tmp)))
-        W_aver.append((key, np.average(W_tmp)))
-        t_aver.append((key, np.average(t_tmp)))
+# Group the tuples by the first two elements using defaultdict
+groups = defaultdict(list)
+for t in aver_lst:
+    key = t[0]
+    groups[key].append((t[1], t[2], t[3]))
 
-    groups = {}
-    # Group the tuples by the first two elements using a dictionary
-    for t in mm_list:
-        for j,a in enumerate(Q2_aver):
-            if a[0] == t[0]:
-                key = (t[0], t[1])
-                if key in groups:
-                    groups[key].append((t[2], Q2_aver[j][1], W_aver[j][1], t_aver[j][1]))
-                else:
-                    groups[key] = [(t[2], Q2_aver[j][1], W_aver[j][1], t_aver[j][1])]                    
+# Extract the desired values from each group
+Q2_aver = [(key, np.average([tup[0] for tup in val])) for key, val in groups.items()]
+W_aver = [(key, np.average([tup[1] for tup in val])) for key, val in groups.items()]
+t_aver = [(key, np.average([tup[2] for tup in val])) for key, val in groups.items()]
 
+# Clear groups for the next loop
+groups.clear()
+
+# Group the tuples by the first two elements using defaultdict
+for t in mm_lst:
+    key = (t[0], t[1])
+    j, k = key
+    Q2_val = Q2_aver[j][1]
+    W_val = W_aver[j][1]
+    t_val = t_aver[j][1]
+    groups[key].append((t[2], Q2_val, W_val, t_val))
+                 
+for hist in histlist:
+    
     yieldValData = array('d', [0])
     Q2binValData = array('d', [0])
     WbinValData = array('d', [0])
@@ -444,29 +479,20 @@ for i,hist in enumerate(histlist):
 
     tbinarr = []
     phibinarr = []
-    # Extract the desired values from each group
     for key, val in groups.items():
-        j = key[0]
-        k = key[1]
+        j, k = key
         tbinarr.append(j)
         phibinarr.append(k)
-        tnum[0] = j+1
-        phinum[0] = k+1
-        tval[0] = (tbinedges[j]+tbinedges[j+1])/2
-        phival[0] = (phibinedges[k]+phibinedges[k+1])/2
+        tnum[0] = j + 1
+        phinum[0] = k + 1
+        tval[0] = np.mean(tbinedges[j:j+2])
+        phival[0] = np.mean(phibinedges[k:k+2])
 
-        MM_tmp = []
-        Q2_tmp = []
-        W_tmp = []
-        t_tmp = []
-        for tup in val:
-            MM_tmp.append(tup[0])
-            Q2_tmp.append(tup[1])
-            W_tmp.append(tup[2])
-            t_tmp.append(tup[3])
-        hist["H_yield_DATA"].Fill(integrate.simps(MM_tmp)*hist["normfac_data"])
-        hist["yieldDictData"][key] = integrate.simps(MM_tmp)*hist["normfac_data"]
-        yieldValData[0] = integrate.simps(MM_tmp)*hist["normfac_data"]
+        MM_tmp, Q2_tmp, W_tmp, t_tmp = zip(*val)
+
+        hist["H_yield_DATA"].Fill(integrate.simps(MM_tmp) * hist["normfac_data"])
+        hist["yieldDictData"][key] = integrate.simps(MM_tmp) * hist["normfac_data"]
+        yieldValData[0] = integrate.simps(MM_tmp) * hist["normfac_data"]
         Q2binValData[0] = Q2_tmp[0]
         WbinValData[0] = W_tmp[0]
         tbinValData[0] = t_tmp[0]
@@ -483,62 +509,76 @@ c_yield_data.Print(outputpdf)
 
 c_yield_simc = TCanvas()
 
-for i,hist in enumerate(histlist):
+# Initialize NumPy arrays before the loop
+Weight = np.array([])
+t = np.array([])
+phi = np.array([])
+phi_deg = np.array([])
+Q2 = np.array([])
+W = np.array([])
+MM = np.array([])
 
-    InFile_SIMC = hist["InFile_SIMC"]
-    TBRANCH_SIMC  = InFile_SIMC.Get("h10")
+for hist in histlist:
+    
+    # Convert to NumPy arrays
+    Weight = np.append(Weight, hist_to_numpy(hist["H_Weight_SIMC"], hist["arr_Weight_SIMC"]))
+    t = np.append(t, hist_to_numpy(hist["H_t_SIMC"], hist["arr_t_SIMC"]))
+    phi = np.append(phi, hist_to_numpy(hist["H_ph_q_SIMC"], hist["arr_phi_SIMC"]))
+    phi_deg = np.append(phi_deg, phi * (180 / math.pi))
+    Q2 = np.append(Q2, hist_to_numpy(hist["H_Q2_SIMC"], hist["arr_Q2_SIMC"]))
+    W = np.append(W, hist_to_numpy(hist["H_W_SIMC"], hist["arr_W_SIMC"]))
+    MM = np.append(MM, hist_to_numpy(hist["H_MM_SIMC"], hist["arr_MM_SIMC"]))
+    
+# Initialize NumPy arrays
+tmp_lst = []
+for j in range(len(tbinedges) - 1):
+    tbin_indices = np.where((tbinedges[j] <= t) & (t < tbinedges[j + 1]))[0]
+    if len(tbin_indices) > 0:
+        tbin_index = j
+        Q2_val = Q2[tbin_index]
+        W_val = W[tbin_index]
+        t_val = t[tbin_index]
+        for k in range(len(phibinedges) - 1):
+            phibin_indices = np.where((phibinedges[k] <= phi_deg) & (phi_deg < phibinedges[k + 1]))[0]
+            if len(phibin_indices) > 0:
+                phibin_index = k
+                # t binning
+                #MM_val = MM[tbin_indices]
+                # t+phi binning
+                # Combine tbin_indices and phibin_indices using logical AND
+                combined_indices = np.intersect1d(tbin_indices, phibin_indices)
+                MM_val = MM[combined_indices]
+                tmp_lst.append((tbin_index, phibin_index, MM_val, Q2_val, W_val, t_val))
 
-    tmp_lst = []
-    for evt in TBRANCH_SIMC:
-        for j in range(len(tbinedges) - 1):
-            if tbinedges[j] <= evt.t < tbinedges[j+1]:
-                tbin_index = j
-            else:
-                tbin_index = None
-            if tbin_index != None:
-                for k in range(len(phibinedges) - 1):
-                    if phibinedges[k] <= (evt.phipq)*(180/math.pi) < phibinedges[k+1]:
-                        phibin_index = k
-                    else:
-                        phibin_index = None
-                    if phibin_index != None:
-                        tmp_lst.append((tbin_index, phibin_index, np.sqrt(pow(evt.Em, 2) - pow(evt.Pm, 2))*evt.Weight, evt.Q2, evt.W, evt.t))
-            
-    groups = {}
-    # Group the tuples by the first two elements using a dictionary
-    for t in tmp_lst:
-        for j,k in zip(tbinarr,phibinarr):
-            if t[0] == j and t[1] == k:
-                key = (t[0], t[1])
-                if key in groups:
-                    groups[key].append((t[2], t[3], t[4], t[5]))
-                else:
-                    groups[key] = [(t[2], t[3], t[4], t[5])]
-            else:
-                continue
-            
+# Group the tuples by the first two elements using defaultdict
+for t in tmp_lst:
+    key = (t[0], t[1])
+    groups[key].append((t[2], t[3], t[4], t[5]))
+
+for hist in histlist:
+    
     yieldValSimc = array('d', [0])
     
     hist["yieldTree"].Branch("yield_simc", yieldValSimc, "yield_simc/D")
     
-    # Extract the desired values from each group
     for key, val in groups.items():
-        MM_tmp = []
-        Q2_tmp = []
-        W_tmp = []
-        t_tmp = []
-        for tup in val:
-            MM_tmp.append(tup[0])
-            Q2_tmp.append(tup[1])
-            W_tmp.append(tup[2])
-            t_tmp.append(tup[3])
-        hist["H_yield_SIMC"].Fill(integrate.simps(MM_tmp)*hist["normfac_simc"])
-        hist["yieldDictSimc"][key] = integrate.simps(MM_tmp)*hist["normfac_simc"]
-        yieldValSimc[0] = integrate.simps(MM_tmp)*hist["normfac_simc"]
+        MM_tmp, Q2_tmp, W_tmp, t_tmp = zip(*val)
+
+        #################
+        # HARD CODED
+        #################
+        
+        hist["H_yield_SIMC"].Fill(integrate.simps(MM_tmp)/(100*hist["normfac_simc"]))
+        hist["yieldDictSimc"][key] = integrate.simps(MM_tmp)/(100*hist["normfac_simc"])
+        yieldValSimc[0] = integrate.simps(MM_tmp)/(100*hist["normfac_simc"])
         hist["yieldTree"].Fill()
 
+        #################
+        #################
+        #################
+
     hist["yieldTree"].ResetBranchAddresses()
-            
+    
     print("\n\n~~~~~~~~~~~~~~~",hist["yieldDictSimc"])
     print("~~~~~~~~~~~~~~~",hist["H_yield_SIMC"])
     hist["H_yield_SIMC"].SetLineColor(i+1)            
@@ -550,34 +590,38 @@ c_Q2tbin = TCanvas()
 
 c_Q2tbin.Divide(3, int(NumtBins/2))
 
-for i,hist in enumerate(histlist):
+# Initialize NumPy arrays before the loop
+t = np.array([])
+Q2 = np.array([])
 
-    InFile_DATA = hist["InFile_DATA"]
-    TBRANCH_DATA  = InFile_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
+for hist in histlist:
+    
+    # Convert to NumPy arrays
+    t = np.append(t, hist_to_numpy(hist["H_t_DATA"], hist["arr_t_DATA"]))
+    Q2 = np.append(Q2, hist_to_numpy(hist["H_Q2_DATA"], hist["arr_Q2_DATA"]))
 
-    aver_lst = []
-    for evt in TBRANCH_DATA:
-        for j in range(len(tbinedges) - 1):
-            if tbinedges[j] <= -evt.MandelT < tbinedges[j+1]:
-                tbin_index = j
-            else:
-                tbin_index = None
-            if tbin_index != None:
-                aver_lst.append((tbin_index, evt.Q2))
+# Initialize NumPy arrays
+aver_lst = []
+for j in range(len(tbinedges) - 1):
+    tbin_indices = np.where((tbinedges[j] <= t) & (t < tbinedges[j + 1]))[0]
+    if len(tbin_indices) > 0:
+        tbin_index = j
+        Q2_val = Q2[tbin_indices]
+        # Append tbin_index, Q2 to aver_lst
+        aver_lst.append((tbin_index, Q2_val))
 
-    groups = {}
-    # Group the tuples by the first two elements using a dictionary
-    for t in aver_lst:
-        key = (t[0])
-        if key in groups:
-            groups[key].append((t[1]))
-        else:
-            groups[key] = [(t[1])]
+# Group the tuples by the first two elements using defaultdict
+groups = defaultdict(list)
+for t in aver_lst:
+    key = t[0]
+    groups[key].append((t[1]))
 
+for hist in histlist:    
     # Extract the desired values from each group
     for key, val in groups.items():
         for tup in val:
-            hist["H_Q2_tbin_DATA_{}".format(key+1)].Fill(tup)
+            for q in tup:
+                hist["H_Q2_tbin_DATA_{}".format(key+1)].Fill(q)
         c_Q2tbin.cd(key+1)
         hist["H_Q2_tbin_DATA_{}".format(key+1)].Draw("same")
         hist["H_Q2_tbin_DATA_{}".format(key+1)].SetLineColor(i+1)
@@ -588,34 +632,38 @@ c_Wtbin = TCanvas()
 
 c_Wtbin.Divide(3, int(NumtBins/2))
 
-for i,hist in enumerate(histlist):
+# Initialize NumPy arrays before the loop
+t = np.array([])
+W = np.array([])
 
-    InFile_DATA = hist["InFile_DATA"]
-    TBRANCH_DATA  = InFile_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
+for hist in histlist:
+    
+    # Convert to NumPy arrays
+    t = np.append(t, hist_to_numpy(hist["H_t_DATA"], hist["arr_t_DATA"]))
+    W = np.append(W, hist_to_numpy(hist["H_W_DATA"], hist["arr_W_DATA"]))
 
-    aver_lst = []
-    for evt in TBRANCH_DATA:
-        for j in range(len(tbinedges) - 1):
-            if tbinedges[j] <= -evt.MandelT < tbinedges[j+1]:
-                tbin_index = j
-            else:
-                tbin_index = None
-            if tbin_index != None:
-                aver_lst.append((tbin_index, evt.W))
+# Initialize NumPy arrays
+aver_lst = []
+for j in range(len(tbinedges) - 1):
+    tbin_indices = np.where((tbinedges[j] <= t) & (t < tbinedges[j + 1]))[0]
+    if len(tbin_indices) > 0:
+        tbin_index = j
+        W_val = W[tbin_indices]
+        # Append tbin_index, W to aver_lst
+        aver_lst.append((tbin_index, W_val))
 
-    groups = {}
-    # Group the tuples by the first two elements using a dictionary
-    for t in aver_lst:
-        key = (t[0])
-        if key in groups:
-            groups[key].append((t[1]))
-        else:
-            groups[key] = [(t[1])]
+# Group the tuples by the first two elements using defaultdict
+groups = defaultdict(list)
+for t in aver_lst:
+    key = t[0]
+    groups[key].append((t[1]))
 
+for hist in histlist:    
     # Extract the desired values from each group
     for key, val in groups.items():
         for tup in val:
-            hist["H_W_tbin_DATA_{}".format(key+1)].Fill(tup)
+            for q in tup:
+                hist["H_W_tbin_DATA_{}".format(key+1)].Fill(q)
         c_Wtbin.cd(key+1)
         hist["H_W_tbin_DATA_{}".format(key+1)].Draw("same")
         hist["H_W_tbin_DATA_{}".format(key+1)].SetLineColor(i+1)
@@ -626,34 +674,38 @@ c_ttbin = TCanvas()
 
 c_ttbin.Divide(3, int(NumtBins/2))
 
-for i,hist in enumerate(histlist):
+# Initialize NumPy arrays before the loop
+t = np.array([])
+t = np.array([])
 
-    InFile_DATA = hist["InFile_DATA"]
-    TBRANCH_DATA  = InFile_DATA.Get("Cut_{}_Events_prompt_RF".format(ParticleType.capitalize()))
+for hist in histlist:
+    
+    # Convert to NumPy arrays
+    t = np.append(t, hist_to_numpy(hist["H_t_DATA"], hist["arr_t_DATA"]))
+    t = np.append(t, hist_to_numpy(hist["H_t_DATA"], hist["arr_t_DATA"]))
 
-    aver_lst = []
-    for evt in TBRANCH_DATA:
-        for j in range(len(tbinedges) - 1):
-            if tbinedges[j] <= -evt.MandelT < tbinedges[j+1]:
-                tbin_index = j
-            else:
-                tbin_index = None
-            if tbin_index != None:
-                aver_lst.append((tbin_index, -evt.MandelT))
+# Initialize NumPy arrays
+aver_lst = []
+for j in range(len(tbinedges) - 1):
+    tbin_indices = np.where((tbinedges[j] <= t) & (t < tbinedges[j + 1]))[0]
+    if len(tbin_indices) > 0:
+        tbin_index = j
+        t_val = t[tbin_indices]
+        # Append tbin_index, t to aver_lst
+        aver_lst.append((tbin_index, t_val))
 
-    groups = {}
-    # Group the tuples by the first two elements using a dictionary
-    for t in aver_lst:
-        key = (t[0])
-        if key in groups:
-            groups[key].append((t[1]))
-        else:
-            groups[key] = [(t[1])]
+# Group the tuples by the first two elements using defaultdict
+groups = defaultdict(list)
+for t in aver_lst:
+    key = t[0]
+    groups[key].append((t[1]))
 
+for hist in histlist:    
     # Extract the desired values from each group
     for key, val in groups.items():
         for tup in val:
-            hist["H_t_tbin_DATA_{}".format(key+1)].Fill(tup)
+            for q in tup:
+                hist["H_t_tbin_DATA_{}".format(key+1)].Fill(q)
         c_ttbin.cd(key+1)
         hist["H_t_tbin_DATA_{}".format(key+1)].Draw("same")
         hist["H_t_tbin_DATA_{}".format(key+1)].SetLineColor(i+1)
