@@ -6,7 +6,9 @@ begin parm experiment
   doing_phsp = 0               	;  (ONE = TRUE)	
   doing_kaon = 0             	;  (ONE = TRUE)
   doing_pion = 1             	;  (ONE = TRUE)
-  which_pion = 0             	;  (0=p->pi+,1=n->pi-,10/11 for pi+/pi- coherent)
+  which_pion = 2             	;  (0=p->pi+,1=n->pi-,10/11 for pi+/pi- coherent)
+  doing_semi = 0                ;  Seni inclusive DIS (SIDIS)
+  doing_hplus = 0               ;  For positive hadrons (pi+) in SIDIS
   doing_decay = 1            	;  1=decay ON, 0=decay OFF.
   ctau = 780.4               	;  decay length (cm)  
 end parm experiment
