@@ -83,11 +83,15 @@ if [[ $s_flag = "true" ]]; then
     fi
     InDATAFilename="Raw_Data_${SPEC}_${KIN}.root"
     InDUMMYFilename="Raw_DummyData_${SPEC}_${KIN}.root"
-    InSIMCFilename="Heep_${SPEC}_${KIN}.root"
+    if [[ $o_flag = "true" ]]; then
+	InSIMCFilename="Heep_${SPEC}_${KIN}_Offset.root"
+    else
+	InSIMCFilename="Heep_${SPEC}_${KIN}.root"
+    fi
     OutDATAFilename="Analysed_Data_${SPEC}_${KIN}"
     OutDUMMYFilename="Analysed_DummyData_${SPEC}_${KIN}"
     if [[ $o_flag = "true" ]]; then
-	OutFullAnalysisFilename="FullAnalysis_Offset_${SPEC}_${KIN}"
+	OutFullAnalysisFilename="FullAnalysis_${SPEC}_${KIN}_Offset"
     else
 	OutFullAnalysisFilename="FullAnalysis_${SPEC}_${KIN}"
     fi
@@ -100,11 +104,15 @@ else
     EffData="coin_heep_HeePCoin_efficiency_data_2022_12_02.csv"
     InDATAFilename="Raw_Data_${KIN}.root"
     InDUMMYFilename="Raw_DummyData_${KIN}.root"
-    InSIMCFilename="Heep_Coin_${KIN}.root"
+    if [[ $o_flag = "true" ]]; then
+	InSIMCFilename="Heep_Coin_${KIN}_Offset.root"
+    else
+	InSIMCFilename="Heep_Coin_${KIN}.root"
+    fi    
     OutDATAFilename="Analysed_Data_${KIN}"
     OutDUMMYFilename="Analysed_DummyData_${KIN}"
     if [[ $o_flag = "true" ]]; then
-	OutFullAnalysisFilename="FullAnalysis_Offset_${KIN}"
+	OutFullAnalysisFilename="FullAnalysis_${KIN}_Offset"
     else
 	OutFullAnalysisFilename="FullAnalysis_${KIN}"
     fi
@@ -115,7 +123,7 @@ grab_runs () {
     RunList=$1
     INPDIR="${REPLAYPATH}/UTIL_BATCH/InputRunLists/KaonLT_2018_2019/${RunList}"
     if [[ -e $INPDIR ]]; then
-	cd "${LTANAPATH}/scripts"
+	cd "${LTANAPATH}/src/setup"
 	RunNumArr=$(python3 getRunNumbers.py $INPDIR)
 	echo $RunNumArr
     else
@@ -214,7 +222,7 @@ fi
 # will create a new root file per run number which are combined using hadd
 if [[ $a_flag = "true" ]]; then
     if [[ $s_flag = "true" ]]; then
-	cd "${LTANAPATH}/scripts/HeeP/SING"
+	cd "${LTANAPATH}/src/HeeP/SING"
 	echo
 	echo "Analysing ${SPEC} data..."
 	echo
@@ -237,7 +245,7 @@ if [[ $a_flag = "true" ]]; then
 	hadd -f ${OutDATAFilename}.root *_-1_${SPEC}_Raw_Data.root
 	#rm -f *_-1_${SPEC}_Raw_Data.root
 
-	cd "${LTANAPATH}/scripts/HeeP/SING"    
+	cd "${LTANAPATH}/src/HeeP/SING"    
 	echo
 	echo "Analysing ${SPEC} dummy data..."
 	echo
@@ -260,7 +268,7 @@ if [[ $a_flag = "true" ]]; then
 	hadd -f ${OutDUMMYFilename}.root *_-1_${SPEC}_Raw_Data.root
 	#rm -f *_-1_${SPEC}_Raw_Data.root	
     else
-	cd "${LTANAPATH}/scripts/HeeP/COIN"
+	cd "${LTANAPATH}/src/HeeP/COIN"
 	echo
 	echo "Analysing data..."
 	echo
@@ -283,7 +291,7 @@ if [[ $a_flag = "true" ]]; then
 	hadd -f ${OutDATAFilename}.root *_-1_Raw_Data.root
 	for i in *_-1_Raw_Data.root; do mv -- "$i" "${i%_-1_Raw_Data.root}_-1_Raw_Target.root"; done
 
-	cd "${LTANAPATH}/scripts/HeeP/COIN"    
+	cd "${LTANAPATH}/src/HeeP/COIN"    
 	echo
 	echo "Analysing dummy data..."
 	echo
@@ -308,7 +316,7 @@ if [[ $a_flag = "true" ]]; then
     fi
 fi
 
-cd "${LTANAPATH}/scripts"
+cd "${LTANAPATH}/src/setup"
 
 # Checks that array isn't empty
 if [[ ${#data[@]} -ne 0 ]]; then
@@ -378,10 +386,10 @@ fi
 
 # Finally, run the plotting script
 if [[ $s_flag = "true" ]]; then
-    cd "${LTANAPATH}/scripts/HeeP/SING"
+    cd "${LTANAPATH}/src/HeeP/SING"
     python3 HeepSing.py ${KIN} "${OutDATAFilename}.root" $DataChargeSum "${DataEffVal[*]}" "${OutDUMMYFilename}.root" $DummyChargeSum "${DummyEffVal[*]}" ${InSIMCFilename} ${OutFullAnalysisFilename} ${EffData} ${SPEC}
 else
-    cd "${LTANAPATH}/scripts/HeeP/COIN"
+    cd "${LTANAPATH}/src/HeeP/COIN"
     python3 HeepCoin.py ${KIN} "${OutDATAFilename}.root" $DataChargeSum "${DataEffVal[*]}" "${data[*]}" "${OutDUMMYFilename}.root" $DummyChargeSum "${DummyEffVal[*]}" "${dummydata[*]}" ${InSIMCFilename} ${OutFullAnalysisFilename} ${EffData}
 fi
 

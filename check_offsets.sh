@@ -56,7 +56,7 @@ done
 
 HEEPFOR="heepcheck"
 
-cd ${LTANAPATH}/scripts
+cd ${LTANAPATH}/src/HeeP
 # When any flag is used then the user input changes argument order
 if [[ $c_flag = "true" && $s_flag = "true" ]]; then
     echo "Compiling ${HEEPFOR}.f..."
@@ -80,6 +80,7 @@ else
     InputSIMC="Heep_Coin_${KIN}"
 fi
 
+cd ${LTANAPATH}/src/setup
 # Python script that gets current values of simc input file
 SIMCINP=`python3 getSetting.py ${InputSIMC}`
 
@@ -88,6 +89,7 @@ SIMCINP=`python3 getSetting.py ${InputSIMC}`
 BEAMINP=`echo ${SIMCINP} | cut -d ',' -f1`
 THETAINP=`echo ${SIMCINP} | cut -d ',' -f2`
 
+cd ${LTANAPATH}/src/HeeP
 # Runs fortran code using 'expect' which takes the user input
 # value then runs the heepcheck script to check offsets
 # (Fotran script is run in background)

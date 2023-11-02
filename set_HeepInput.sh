@@ -27,7 +27,7 @@ SIMCPATH=`echo ${PATHFILE_INFO} | cut -d ','  -f16`
 LTANAPATH=`echo ${PATHFILE_INFO} | cut -d ','  -f17`
 
 # Flag definitions (flags: h, c, a, s)
-while getopts 'hcas' flag; do
+while getopts 'hcaso' flag; do
     case "${flag}" in
         h) 
         echo "----------------------------------------------------------"
@@ -38,6 +38,7 @@ while getopts 'hcas' flag; do
         echo
         echo "The following flags can be called for the heep analysis..."
         echo "    -h, help"
+	echo "    -o, offset to replay applied"
         echo "    -c, compile fortran code (singles only)"
 	echo "    -a, run SIMC with new settings"
 	echo "        coin -> KIN=arg1"
@@ -48,6 +49,7 @@ while getopts 'hcas' flag; do
         c) c_flag='true' ;;
 	a) a_flag='true' ;;
 	s) s_flag='true' ;;
+	o) o_flag='true' ;;
         *) print_usage
         exit 1 ;;
     esac
@@ -57,7 +59,7 @@ done
 if [[ $s_flag = "true" ]]; then
     ELASFOR="elas_kin"
 
-    cd ${LTANAPATH}/scripts/HeeP/SING
+    cd ${LTANAPATH}/src/HeeP/SING
     
     # When compile flage is used... 
     # Run the fortran elastics code for calculating 
@@ -81,7 +83,7 @@ if [[ $s_flag = "true" ]]; then
 
     InputSIMC="Heep_${SPEC}_${KIN}"
 
-    cd ${LTANAPATH}/scripts
+    cd ${LTANAPATH}/src/setup
     
     # Python script that gets current values of simc input file
     SIMCINP=`python3 getSetting.py ${InputSIMC}`
@@ -91,7 +93,7 @@ if [[ $s_flag = "true" ]]; then
     BEAMINP=`echo ${SIMCINP} | cut -d ',' -f1`
     THETAINP=`echo ${SIMCINP} | cut -d ',' -f2`
 
-    cd ${LTANAPATH}/scripts/HeeP/SING
+    cd ${LTANAPATH}/src/HeeP/SING
     # Runs fortran code using 'expect' which takes the user input
     # value then saves the created kinematic table as a variable
     # (Fotran script is run in background)
@@ -104,16 +106,20 @@ if [[ $s_flag = "true" ]]; then
 # When analysis flag is used then simc is run
 # for simc input file defined below
 elif [[ $a_flag = "true" ]]; then
-    cd ${LTANAPATH}/scripts/HeeP/COIN
+    cd ${LTANAPATH}/src/HeeP/COIN
     KIN=$2
 
-    InputSIMC="Heep_Coin_${KIN}"
+    if [[ $o_flag = "true" ]]; then
+	InputSIMC="Heep_Coin_${KIN}_Offset"
+    else
+	InputSIMC="Heep_Coin_${KIN}"
+    fi
     
     echo
     echo 
     echo "Running simc analysis for ${InputSIMC}..."
     echo
-    cd ${LTANAPATH}/scripts
-    ./run_simc_tree "${InputSIMC}"
+    cd ${LTANAPATH}/src/setup
+    ./run_simc_tree "${InputSIMC}" "heep"
 fi
 

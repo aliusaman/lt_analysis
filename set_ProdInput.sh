@@ -101,13 +101,16 @@ InputSIMC_right="Prod_Coin_Q${Q2}W${W}right_${EPSILON}e"
 InputSIMC_left="Prod_Coin_Q${Q2}W${W}left_${EPSILON}e"
 InputSIMC_center="Prod_Coin_Q${Q2}W${W}center_${EPSILON}e"
 
-cd ${LTANAPATH}/scripts
+cd ${LTANAPATH}/src/setup
+
+python3 set_q2_simc.py ${Q2}
+
 if [[ -f "${LTANAPATH}/input/${InputSIMC_right}.inp" ]]; then
     echo
     echo 
     echo "Running simc analysis for ${InputSIMC_right}..."
     echo
-    ./run_simc_tree "${InputSIMC_right}"
+    ./run_simc_tree "${InputSIMC_right}" "production"
 fi
 
 if [[ -f "${LTANAPATH}/input/${InputSIMC_left}.inp" ]]; then
@@ -115,7 +118,7 @@ if [[ -f "${LTANAPATH}/input/${InputSIMC_left}.inp" ]]; then
     echo 
     echo "Running simc analysis for ${InputSIMC_left}..."
     echo
-    ./run_simc_tree "${InputSIMC_left}"
+    ./run_simc_tree "${InputSIMC_left}" "production"
 fi
 
 if [[ -f "${LTANAPATH}/input/${InputSIMC_center}.inp" ]]; then
@@ -123,5 +126,5 @@ if [[ -f "${LTANAPATH}/input/${InputSIMC_center}.inp" ]]; then
     echo 
     echo "Running simc analysis for ${InputSIMC_center}..."
     echo
-    ./run_simc_tree "${InputSIMC_center}"
+    ./run_simc_tree "${InputSIMC_center}" "production"
 fi

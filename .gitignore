@@ -17,19 +17,25 @@ Tmp*
 # Data files
 list.*
 *.dat
-t_bin_interval*
+*_bin_interval*
 x_unsep.*
+Eb*
+par.*
 
 # Fortran
 average_kinematics
 calc_xsect
 fort.99
 
+# Active fortran scripts
+param_active.f
+param_active.py
+xmodel_active.f
+
 # Directories
 __pycache__
 build
 average_kinematics
-
 
 # Sym link
 worksim

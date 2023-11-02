@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2023-03-02 11:23:14 trottar"
+# Time-stamp: "2023-10-08 13:08:41 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -97,12 +97,15 @@ if [[ -z "$2" || ! "$W" =~ 3p02|2p74|3p14|2p32|2p95|2p40 ]]; then # Check the 3r
     done
 fi
 
+ParticleType=$3
+POL=$4
+
+NumtBins=$5
+NumPhiBins=$6
+
 ##############
 # HARD CODED #
 ##############
-
-# Define global variables for lt_analysis scripts
-POL="+1" # All KaonLT is positive polarity
 
 if [[ $Q2 = "5p5" && $W = "3p02" ]]; then
     LOEPS=0.1838
@@ -134,6 +137,10 @@ if [[ $Q2 = "0p5" && $W = "2p40" ]]; then
     HIEPS=0.6979
 fi
 
+##############
+##############
+##############
+
 echo
 echo "---------------------------------------------------------"
 echo
@@ -152,16 +159,32 @@ cd "${LTANAPATH}/src/"
 echo
 echo "Compiling average_kinematics.f..."
 eval "gfortran -o average_kinematics average_kinematics.f"
+# Check the exit status of the Fortran script
+if [ $? -ne 0 ]; then
+    echo
+    echo
+    echo "2 ERROR: Fortran script failed!"
+    echo "       See error above..."
+    exit 1
+fi
 echo
 echo "Running average_kinematics..."
-./average_kinematics.expect ${POL} ${Q2} ${LOEPS} ${HIEPS}
+./average_kinematics.expect ${ParticleType} ${POL} ${Q2} ${LOEPS} ${HIEPS}
 
 echo
 echo "Compiling calc_xsect.f..."
 eval "gfortran -o calc_xsect calc_xsect.f"
+# Check the exit status of the Fortran script
+if [ $? -ne 0 ]; then
+    echo
+    echo
+    echo "2 ERROR: Fortran script failed!"
+    echo "       See error above..."
+    exit 1
+fi
 echo
 echo "Running calc_xsect..."
-./calc_xsect.expect ${POL} ${Q2} ${LOEPS} ${HIEPS}
+./calc_xsect.expect ${ParticleType} ${POL} ${Q2} ${LOEPS} ${HIEPS}
 
 # Replace p with '.'
 Q2=${Q2//./p}
@@ -169,14 +192,15 @@ Q2=${Q2//./p}
 KIN="Q${Q2}W${W}"
 
 # Define input and output file names
-OutUnsepxsectsFilename="unsep_xsects_${KIN}"
+OutUnsepxsectsFilename="${ParticleType}_xsects_${KIN}"
 
-python3 plot_unsep.py ${Q2} ${W} ${LOEPS} ${HIEPS} ${KIN} ${OutUnsepxsectsFilename}
-
-cd "${LTANAPATH}"
-evince "OUTPUT/Analysis/${ANATYPE}LT/${OutUnsepxsectsFilename}.pdf"
-
-echo
-echo
-echo
-echo "Script Complete!"
+cd "${LTANAPATH}/src/plotting/"
+python3 plot_xsects.py ${ParticleType} ${POL} ${Q2} ${W} ${LOEPS} ${HIEPS} ${NumtBins} ${NumPhiBins} ${KIN} ${OutUnsepxsectsFilename}
+# Check the exit status of the Python script
+if [ $? -ne 0 ]; then
+    echo
+    echo
+    echo "2 ERROR: Python script failed!"
+    echo "       See error above..."
+    exit 1
+fi
