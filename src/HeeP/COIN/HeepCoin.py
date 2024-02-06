@@ -1878,10 +1878,10 @@ c_ctvhbeta = TCanvas()
 c_ctvhbeta.Divide(2,1)
 
 c_ctvhbeta.cd(1)
-CoinTime_vs_pbeta_DATA_nocut.Draw("colz")
+CoinTime_vs_hbeta_DATA_nocut.Draw("colz")
 
 c_ctvhbeta.cd(2)
-CoinTime_vs_pbeta_DATA.Draw("colz")
+CoinTime_vs_hbeta_DATA.Draw("colz")
 
 c_ctvhbeta.Print(outputpdf)
 
