@@ -1,11 +1,11 @@
 ; This is a CTP file
 
 begin parm experiment
-  ngen = 500000			;  POS: # of successes; NEG: # of tries
+  ngen = 200000			;  POS: # of successes; NEG: # of tries
   EXPER%charge = 1.0		;  total charge (mC)
   doing_phsp = 0               	;  (ONE = TRUE)	
-  doing_kaon = 0             	;  (ONE = TRUE)
-  doing_pion = 1             	;  (ONE = TRUE)
+  doing_kaon = 1             	;  (ONE = TRUE)
+  doing_pion = 0             	;  (ONE = TRUE)
   which_pion = 0             	;  (0=p->pi+,1=n->pi-,10/11 for pi+/pi- coherent)
   doing_decay = 1            	;  1=decay ON, 0=decay OFF.
   ctau = 780.4               	;  decay length (cm)  
@@ -16,10 +16,10 @@ begin parm kinematics_main
   dEbeam = 0.05			;  beam energy variation (%)
   electron_arm = 1              ;  1=hms,2=sos,3=hrsr,4=hrsl,5=shms 		
   hadron_arm = 5                ;  1=hms,2=sos,3=hrsr,4=hrsl,5=shms
-  spec%e%P = 4707.3		;  e arm central momentum (MeV/c)
-  spec%e%theta = 17.132   	;  e arm angle setting (degrees)
-  spec%p%P = 5378.2		;  p arm central momentum (MeV/c)
-  spec%p%theta = 9.868   	;  p arm angle setting (degrees)
+  spec%e%P = 6583.4		;  e arm central momentum (MeV/c)
+  spec%e%theta = 11.967   	;  e arm angle setting (degrees)
+  spec%p%P = 3479.0		;  p arm central momentum (MeV/c)
+  spec%p%theta = 15.238   	;  p arm angle setting (degrees)
 end parm kinematics_main
 
 begin parm target
