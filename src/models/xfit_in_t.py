@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2024-02-19 02:47:50 trottar"
+# Time-stamp: "2024-02-22 15:55:37 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -177,6 +177,24 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     f_sigL_pre = TF2("sig_L", fun_Sig_L, tmin_range, tmax_range, Q2min_range, Q2max_range, 4)
     f_sigL_pre.SetParNames("p1","p2","p3","p4")
     f_sigL_pre.SetParameters(l0, l1, l2, l3)
+
+    ##############
+    # HARD CODED #
+    ##############
+    # Fixed unused parameters
+    #f_sigL_pre.FixParameter(0, 0)
+    #f_sigL_pre.FixParameter(1, 0)
+    #f_sigL_pre.FixParameter(2, 0)
+    #f_sigL_pre.FixParameter(3, 0)
+    # Fixing sigL terms for testing
+    f_sigL_pre.FixParameter(0, l0)
+    f_sigL_pre.FixParameter(1, l1)
+    #f_sigL_pre.FixParameter(1, 0.0)
+    f_sigL_pre.FixParameter(2, l2)
+    f_sigL_pre.FixParameter(3, l3)
+    ##############
+    ##############
+    ##############    
     
     #g_sigl = TGraphErrors(nsep.GetSelectedRows(), nsep.GetV2(), nsep.GetV1(), 0, nsep.GetV3())
     g_sigl = TGraphErrors()
@@ -221,6 +239,24 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     f_sigL.SetParNames("p1","p2","p3","p4")
     f_sigL.SetParameters(l0, l1, l2, l3)
 
+    ##############
+    # HARD CODED #
+    ##############
+    # Fixed unused parameters
+    #f_sigL.FixParameter(0, 0)
+    #f_sigL.FixParameter(1, 0)
+    #f_sigL.FixParameter(2, 0)
+    #f_sigL.FixParameter(3, 0)
+    # Fixing sigL terms for testing
+    f_sigL.FixParameter(0, l0)
+    f_sigL.FixParameter(1, l1)
+    #f_sigL.FixParameter(1, 0.0)
+    f_sigL.FixParameter(2, l2)
+    f_sigL.FixParameter(3, l3)    
+    ##############
+    ##############
+    ##############    
+    
     g_q2_sigl_fit = ROOT.TGraph2DErrors()
     for i in range(len(w_vec)):
         g_q2_sigl_fit.SetPoint(g_q2_sigl_fit.GetN(), g_sigl_fit.GetX()[i], q2_vec[i], g_sigl_fit.GetY()[i])
@@ -241,14 +277,6 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
         f_sigL_xproj.Draw("same")
         
         g_sigl_fit.Fit(f_sigL_xproj)
-
-        # Check the fit status for 'f_sigL'
-        f_sigL_status = f_sigL_xproj.GetNDF()  # GetNDF() returns the number of degrees of freedom
-        f_sigL_status_message = "Not Fitted" if f_sigL_status == 0 else "Fit Successful"
-        
-        fit_status = TText()
-        fit_status.SetTextSize(0.04)
-        fit_status.DrawTextNDC(0.35, 0.80-(0.05*i), " t-bin {} Fit Status: {}".format(i+1, f_sigL_status_message))
 
     # Check the fit status for 'f_sigL'
     f_sigL_status = f_sigL.GetNDF()  # GetNDF() returns the number of degrees of freedom
@@ -293,6 +321,21 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     f_sigT_pre = TF2("sig_T", fun_Sig_T, tmin_range, tmax_range, Q2min_range, Q2max_range, 4)
     f_sigT_pre.SetParNames("p5","p6","p7","p8")
     f_sigT_pre.SetParameters(t0, t1, t2, t3)
+
+    ##############
+    # HARD CODED #
+    ##############
+    # Fixed unused parameters
+    #f_sigT_pre.FixParameter(0, 0)
+    #f_sigT_pre.FixParameter(1, 0)
+    f_sigT_pre.FixParameter(2, 0)
+    f_sigT_pre.FixParameter(3, 0)
+    # Fixing sigL terms for testing
+    f_sigT_pre.FixParameter(0, 20)
+    f_sigT_pre.FixParameter(1, t1)
+    ##############
+    ##############
+    ##############    
     
     #g_sigt = TGraphErrors(nsep.GetSelectedRows(), nsep.GetV2(), nsep.GetV1(), [0] * nsep.GetSelectedRows(), nsep.GetV3())
     g_sigt = TGraphErrors()
@@ -336,6 +379,21 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     f_sigT = TF2("sig_T", fun_Sig_T, tmin_range, tmax_range, Q2min_range, Q2max_range, 4)
     f_sigT.SetParNames("p5","p6","p7","p8")
     f_sigT.SetParameters(t0, t1, t2, t3)
+
+    ##############
+    # HARD CODED #
+    ##############
+    # Fixed unused parameters
+    #f_sigT.FixParameter(0, 0)
+    #f_sigT.FixParameter(1, 0)
+    f_sigT.FixParameter(2, 0)
+    f_sigT.FixParameter(3, 0)
+    # Fixing sigL terms for testing
+    f_sigT.FixParameter(0, 20)
+    f_sigT.FixParameter(1, t1)
+    ##############
+    ##############
+    ##############    
     
     g_q2_sigt_fit = ROOT.TGraph2DErrors()
     for i in range(len(w_vec)):
@@ -357,14 +415,6 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
         f_sigT_xproj.Draw("same")
 
         g_sigt_fit.Fit(f_sigT_xproj)
-
-        # Check the fit status for 'f_sigT'
-        f_sigT_status = f_sigT_xproj.GetNDF()  # GetNDF() returns the number of degrees of freedom
-        f_sigT_status_message = "Not Fitted" if f_sigT_status == 0 else "Fit Successful"
-        
-        fit_status = TText()
-        fit_status.SetTextSize(0.04)
-        fit_status.DrawTextNDC(0.35, 0.80-(0.05*i), " t-bin {} Fit Status: {}".format(i+1, f_sigT_status_message))
 
     # Check the fit status for 'f_sigT'
     f_sigT_status = f_sigT.GetNDF()  # GetNDF() returns the number of degrees of freedom
@@ -409,6 +459,22 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     f_sigLT_pre = TF2("sig_LT", fun_Sig_LT, tmin_range, tmax_range, Q2min_range, Q2max_range, 4)
     f_sigLT_pre.SetParNames("p9","p10","p11","p12")
     f_sigLT_pre.SetParameters(lt0, lt1, lt2, lt3)
+
+    ##############
+    # HARD CODED #
+    ##############
+    # Fixed unused parameters
+    #f_sigLT_pre.FixParameter(0, 0)
+    #f_sigLT_pre.FixParameter(1, 0)
+    #f_sigLT_pre.FixParameter(2, 0)
+    f_sigLT_pre.FixParameter(3, 0)
+    # Fixing sigLT terms for testing
+    f_sigLT_pre.FixParameter(0, lt0)
+    f_sigLT_pre.FixParameter(1, lt1)
+    f_sigLT_pre.FixParameter(2, lt2)
+    ##############
+    ##############
+    ##############    
     
     #g_siglt = TGraphErrors(nsep.GetSelectedRows(), nsep.GetV2(), nsep.GetV1(), ROOT.nullptr, nsep.GetV3())
     g_siglt = TGraphErrors()
@@ -457,6 +523,22 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     f_sigLT.SetParNames("p9","p10","p11","p12")
     f_sigLT.SetParameters(lt0, lt1, lt2, lt3)
 
+    ##############
+    # HARD CODED #
+    ##############
+    # Fixed unused parameters
+    #f_sigLT.FixParameter(0, 0)
+    #f_sigLT.FixParameter(1, 0)
+    #f_sigLT.FixParameter(2, 0)
+    f_sigLT.FixParameter(3, 0)
+    # Fixing sigLT terms for testing
+    f_sigLT.FixParameter(0, lt0)
+    f_sigLT.FixParameter(1, lt1)
+    f_sigLT.FixParameter(2, lt2)    
+    ##############
+    ##############
+    ##############    
+    
     g_q2_siglt_fit = ROOT.TGraph2DErrors()
     for i in range(len(w_vec)):
         g_q2_siglt_fit.SetPoint(g_q2_siglt_fit.GetN(), g_siglt_fit.GetX()[i], q2_vec[i], g_siglt_fit.GetY()[i])
@@ -477,14 +559,6 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
         f_sigLT_xproj.Draw("same")
 
         g_siglt_fit.Fit(f_sigLT_xproj)
-
-        # Check the fit status for 'f_sigLT'
-        f_sigLT_status = f_sigLT_xproj.GetNDF()  # GetNDF() returns the number of degrees of freedom
-        f_sigLT_status_message = "Not Fitted" if f_sigLT_status == 0 else "Fit Successful"
-        
-        fit_status = TText()
-        fit_status.SetTextSize(0.04)
-        fit_status.DrawTextNDC(0.35, 0.80-(0.05*i), " t-bin {} Fit Status: {}".format(i+1, f_sigLT_status_message))
 
     # Check the fit status for 'f_sigLT'
     f_sigLT_status = f_sigLT.GetNDF()  # GetNDF() returns the number of degrees of freedom
@@ -529,6 +603,20 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     f_sigTT_pre = TF2("sig_TT", fun_Sig_TT, tmin_range, tmax_range, Q2min_range, Q2max_range, 4)
     f_sigTT_pre.SetParNames("p13","p14","p15","p16")
     f_sigTT_pre.SetParameters(tt0, tt1, tt2, tt3)
+
+    ##############
+    # HARD CODED #
+    ##############
+    # Fixed unused parameters
+    #f_sigTT_pre.FixParameter(0, 0)
+    f_sigTT_pre.FixParameter(1, 0)
+    f_sigTT_pre.FixParameter(2, 0)
+    f_sigTT_pre.FixParameter(3, 0)
+    # Fixing sigTT terms for testing
+    f_sigTT_pre.FixParameter(0, tt0)
+    ##############
+    ##############
+    ##############    
     
     #g_sigtt = TGraphErrors(nsep.GetSelectedRows(), nsep.GetV2(), nsep.GetV1(), [0]*nsep.GetSelectedRows(), nsep.GetV3())
     g_sigtt = TGraphErrors()
@@ -578,6 +666,20 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     f_sigTT = TF2("sig_TT", fun_Sig_TT, tmin_range, tmax_range, Q2min_range, Q2max_range, 4)
     f_sigTT.SetParNames("p13","p14","p15","p16")
     f_sigTT.SetParameters(tt0, tt1, tt2, tt3)
+
+    ##############
+    # HARD CODED #
+    ##############
+    # Fixed unused parameters
+    #f_sigTT.FixParameter(0, 0)
+    f_sigTT.FixParameter(1, 0)
+    f_sigTT.FixParameter(2, 0)
+    f_sigTT.FixParameter(3, 0)
+    # Fixing sigTT terms for testing
+    f_sigTT.FixParameter(0, tt0)
+    ##############
+    ##############
+    ##############    
     
     g_q2_sigtt_fit = ROOT.TGraph2DErrors()
     for i in range(len(w_vec)):
@@ -599,14 +701,6 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
         f_sigTT_xproj.Draw("same")
 
         g_sigtt_fit.Fit(f_sigTT_xproj)
-
-        # Check the fit status for 'f_sigTT'
-        f_sigTT_status = f_sigTT_xproj.GetNDF()  # GetNDF() returns the number of degrees of freedom
-        f_sigTT_status_message = "Not Fitted" if f_sigTT_status == 0 else "Fit Successful"
-        
-        fit_status = TText()
-        fit_status.SetTextSize(0.04)
-        fit_status.DrawTextNDC(0.35, 0.80-(0.05*i), " t-bin {} Fit Status: {}".format(i+1, f_sigTT_status_message))
 
     # Check the fit status for 'f_sigTT'
     f_sigTT_status = f_sigTT.GetNDF()  # GetNDF() returns the number of degrees of freedom
@@ -645,11 +739,11 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
         if old != new:
             print("par{} changed from {:.3f} to {:.3f}".format(i+1, old, new))
 
-    '''
+    #'''
     para_file_out = "{}/src/{}/parameters/par.{}_Q{}W{}.dat".format(LTANAPATH, ParticleType, pol_str, q2_set.replace("p",""), w_set.replace("p",""))
     print("\nWriting {}...".format(para_file_out))
     with open(para_file_out, 'w') as f:
         for i in range(len(par_vec)):
             f.write("{:13.5e} {:13.5e} {:3d} {:12.1f}\n".format(par_vec[i], par_err_vec[i], i, par_chi2_vec[i]))
             print("  {:.3f} {:.3f} {:.1f} {:.1f}".format(par_vec[i], par_err_vec[i], i, par_chi2_vec[i]))
-    '''
+    #'''

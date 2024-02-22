@@ -6,9 +6,8 @@
 * in the 'main' structure), and returns the kaon cross section.
 *
 *       RLT: (9/15/2023) Updated for kaon cross section
-*       RLT (1/30/2024): Updated comments of units (GeV**2 to MeV**2)
 *   output:
-*	peek		!d5sigma/dEe'dOmegae'Omegak	(microbarn/GeV/sr^2)
+*	peek		!d5sigma/dEe'dOmegae'Omegak	(microbarn/MeV/sr^2)
 
 	implicit none
 	include 'simulate.inc'
@@ -399,11 +398,23 @@ c	write(6,*)' phicm ',phicm*180./3.14159,phicm_fer*180./3.14159,phipq*180./3.141
 *	   sigl=(fitpar(1)+fitpar(2)*log(Q2_g))
 *       1           *exp((fitpar(3)+fitpar(4)*log(Q2_g))*(abs(t_gev)-0.2))
 *       RLT (10/12/2023): Removed 0.2 to keep things as simple as possible for
-*                         initial start parameterization
+*       initial start parameterization
+*       RLT (2/19/2024): Adding a 0.2 term to t dependence to bring down the
+*                        extreme slope at high t
+*	   sigl=(fitpar(1)+fitpar(2)*log(Q2_g))
+*       1           *exp((fitpar(3)+fitpar(4)*log(Q2_g))*(abs(t_gev)))
 	   sigl=(fitpar(1)+fitpar(2)*log(Q2_g))
-     1           *exp((fitpar(3)+fitpar(4)*log(Q2_g))*(abs(t_gev)))
-	   sigt=fitpar(5)+fitpar(6)*log(Q2_g)
-     1           +(fitpar(7)+fitpar(8)*log(Q2_g))*ftav
+     1           *exp((fitpar(3)+fitpar(4)*log(Q2_g))*(abs(t_gev)+0.2))
+*       RLT (2/15/2024): Removing t dependence from sigT because it seems
+*                        to be driving poor sep xsects results
+*       RLT (2/20/2024): Added 1/Q^4 term to dampen sigT
+*       RLT (2/21/2024): Using global analysis sig T model and params
+*       (https://journals.aps.org/prc/pdf/10.1103/PhysRevC.85.018202)
+*       sigt=fitpar(5)+fitpar(6)*log(Q2_g)
+*       1           +(fitpar(7)+fitpar(8)*log(Q2_g))*ftav
+*       sigt=fitpar(5)+fitpar(6)*log(Q2_g)
+*       sigt=fitpar(5)*log(Q2_g)+fitpar(6)/(Q2_g**2)
+	   sigt=fitpar(5)/(1+fitpar(6)*Q2_g)
 
 	   siglt=(fitpar(9)*exp(fitpar(10)*abs(t_gev))
      1           +fitpar(11)/abs(t_gev))*sin(thetacm)
@@ -419,10 +430,10 @@ c	write(6,*)' phicm ',phicm*180./3.14159,phicm_fer*180./3.14159,phipq*180./3.141
 	   sig219=(sigt+main%epsilon*sigl+main%epsilon*cos(2.*phicm)*sigtt
      >		+sqrt(2.0*main%epsilon*(1.+main%epsilon))*cos(phicm)*siglt)/1.d0
 	  
-c now convert to different W
-c W dependence given by 1/(W^2-M^2)^2
-c factor 15.333 is value of (w**2-ami**2)**2 at W=2.19
-
+c       now convert to different W
+c       W dependence given by 1/(W^2-M^2)^2
+c       factor 15.333 is value of (w**2-ami**2)**2 at W=2.19
+	   
 	  wfactor=1.D0/(s_gev-mtar_gev**2)**2
 	  sig=sig219*wfactor
 	  sigl=sigl*wfactor
@@ -441,10 +452,8 @@ c 	  write(*,*) 'sigTT =',sigTT
 c 	  write(*,*) '-----------------------------------------------------'
 C--->Debug
 
-*       RLT (1/30/2024): Removed 1.d+06 because
-*                        units are GeV**2 not MeV**2
-*       sig=sig/2./pi/1.d+06      !dsig/dtdphicm in microbarns/MeV**2/rad	  
-	  sig=sig/2./pi   !dsig/dtdphicm in microbarns/GeV**2/rad
+*       RLT (2/6/2024): Removed 2./pi/1.d+06, because not needed. Already converted
+	  sig=sig/2./pi/1.d+06	!dsig/dtdphicm in microbarns/MeV**2/rad
 
 c       RLT (10/30/2023): Testing this sig with the flux corrected one below
 	  ntup%sigcm = sig
@@ -459,10 +468,10 @@ c	  write(*,*) '====================================================='
 C--->Debug
 
 *******************************************************************************
-* sigma_eek is two-fold C.M. cross section: d2sigma/dt/dphi_cm [ub/GeV**2/rad]
+* sigma_eek is two-fold C.M. cross section: d2sigma/dt/dphi_cm [ub/MeV**2/rad]
 * Convert from dt dphi_cm --> dOmega_lab using 'jacobian' [ub/sr]
-* Convert to 5-fold by multiplying by flux factor, gtpr [1/GeV]
-* to give d5sigma/dOmega_k/dOmega_e/dE_e [ub/Gev/sr].
+* Convert to 5-fold by multiplying by flux factor, gtpr [1/MeV]
+* to give d5sigma/dOmega_k/dOmega_e/dE_e [ub/MeV/sr].
 *******************************************************************************
 *******************************************************************************
 c NEW VERSION WHERE TARGET NUCLEON IS AT REST (AS IN EXPERIMENTAL REPLAY)
@@ -512,6 +521,10 @@ c	write(6,*)' jac ',davejac_fer,jacobian
 	gtpr = alpha/2./(pi**2)*vertex%e%E/vertex%Ein*(s_gev-mtar_gev**2)/2./
      >		(targ%Mtar_struck)/Q2_g/(1.-epsi)
 
+*       RLT (2/8/2024):Comment above by Dave on units is slightly off
+* 	               gtpr units MeV (rest of units cancel out, not 1/MeV)
+* 	               sig units ub/MeV**2/rad
+* 	               davesig units ub/MeV/src
 	davesig = gtpr*sig*jacobian
 *******************************************************************************
 

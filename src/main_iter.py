@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2024-02-19 03:57:14 trottar"
+# Time-stamp: "2024-02-22 16:43:26 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -41,8 +41,8 @@ from utility import show_pdf_with_evince, create_dir, is_root_obj, is_hist, hist
 ##################################################################################################################################################
 # Check the number of arguments provided to the script
 
-if len(sys.argv)-1!=12:
-    print("!!!!! ERROR !!!!!\n Expected 12 arguments\n Usage is with - KIN W Q2 EPSVAL ParticleType EPSSET POL OutFilename formatted_date NumtBins NumPhiBins inp_debug\n!!!!! ERROR !!!!!")
+if len(sys.argv)-1!=13:
+    print("!!!!! ERROR !!!!!\n Expected 13 arguments\n Usage is with - KIN W Q2 LOEPS HIEPS ParticleType EPSSET POL OutFilename formatted_date NumtBins NumPhiBins inp_debug\n!!!!! ERROR !!!!!")
     sys.exit(1)
 
 ##################################################################################################################################################    
@@ -51,15 +51,16 @@ if len(sys.argv)-1!=12:
 kinematics = sys.argv[1].split("_")
 W = sys.argv[2]
 Q2 = sys.argv[3]
-EPSVAL = sys.argv[4]
-ParticleType = sys.argv[5]
-EPSSET = sys.argv[6]
-POL = sys.argv[7]
-OutFilename = sys.argv[8]
-formatted_date = sys.argv[9]
-NumtBins = sys.argv[10]
-NumPhiBins = sys.argv[11]
-inp_debug =  sys.argv[12]
+LOEPS = sys.argv[4]
+HIEPS = sys.argv[5]
+ParticleType = sys.argv[6]
+EPSSET = sys.argv[7]
+POL = sys.argv[8]
+OutFilename = sys.argv[9]
+formatted_date = sys.argv[10]
+NumtBins = sys.argv[11]
+NumPhiBins = sys.argv[12]
+inp_debug =  sys.argv[13]
 
 if inp_debug == "False":
     DEBUG = False # Flag for no plot splash
@@ -74,6 +75,11 @@ else:
     print("ERROR: Invalid polarity...must be +1 or -1")
     sys.exit(2)
 
+if EPSSET == "low":
+    EPSVAL = LOEPS
+else:
+    EPSVAL = HIEPS    
+    
 ###############################################################################################################################################
 # ltsep package import and pathing definitions
 
@@ -124,6 +130,45 @@ print("\n\nThe last iteration was ",closest_date)
 
 # Save this as the directory to grab further information
 prev_iter_dir = "{}/{}/{}/Q{}W{}/{}".format(CACHEPATH,USER,ParticleType.lower(),Q2,W,closest_date)
+
+# Copy all files from previous iteration to OUTPATH to assure consistency
+# List all files in the source directory
+files = os.listdir(prev_iter_dir+'/averages/')
+for f in files:
+    print("Copying {} to {}".format(prev_iter_dir+'/averages/'+f, '{}/src/{}/averages/'.format(LTANAPATH, ParticleType)))
+    shutil.copy(prev_iter_dir+'/averages/'+f, '{}/src/{}/averages/'.format(LTANAPATH, ParticleType))
+files = os.listdir(prev_iter_dir+'/kindata/')
+for f in files:
+    print("Copying {} to {}".format(prev_iter_dir+'/kindata/'+f, '{}/src/{}/kindata/'.format(LTANAPATH, ParticleType)))
+    shutil.copy(prev_iter_dir+'/kindata/'+f, '{}/src/{}/kindata/'.format(LTANAPATH, ParticleType))
+files = os.listdir(prev_iter_dir+'/parameters/')
+for f in files:
+    print("Copying {} to {}".format(prev_iter_dir+'/parameters/'+f, '{}/src/{}/parameters/'.format(LTANAPATH, ParticleType)))
+    shutil.copy(prev_iter_dir+'/parameters/'+f, '{}/src/{}/parameters/'.format(LTANAPATH, ParticleType))
+files = os.listdir(prev_iter_dir+'/xsects/')
+for f in files:
+    print("Copying {} to {}".format(prev_iter_dir+'/xsects/'+f, '{}/src/{}/xsects/'.format(LTANAPATH, ParticleType)))
+    shutil.copy(prev_iter_dir+'/xsects/'+f, '{}/src/{}/xsects/'.format(LTANAPATH, ParticleType))
+files = os.listdir(prev_iter_dir+'/yields/')
+for f in files:
+    print("Copying {} to {}".format(prev_iter_dir+'/yields/'+f, '{}/src/{}/yields/'.format(LTANAPATH, ParticleType)))
+    shutil.copy(prev_iter_dir+'/yields/'+f, '{}/src/{}/yields/'.format(LTANAPATH, ParticleType))
+print("Copying {} to {}".format(prev_iter_dir+'/lt_2D_fit.py', '{}/src/models/lt_2D_fit.py'.format(LTANAPATH)))
+shutil.copy(prev_iter_dir+'/lt_2D_fit.py', '{}/src/models/lt_2D_fit.py'.format(LTANAPATH))
+print("Copying {} to {}".format(prev_iter_dir+'/lt_kaon_pl.py', '{}/src/models/lt_kaon_pl.py'.format(LTANAPATH)))
+shutil.copy(prev_iter_dir+'/lt_kaon_pl.py', '{}/src/models/lt_kaon_pl.py'.format(LTANAPATH))
+print("Copying {} to {}".format(prev_iter_dir+'/param_kaon_pl.py', '{}/src/models/param_kaon_pl.py'.format(LTANAPATH)))
+shutil.copy(prev_iter_dir+'/param_kaon_pl.py', '{}/src/models/param_kaon_pl.py'.format(LTANAPATH))
+print("Copying {} to {}".format(prev_iter_dir+'/xmodel_kaon_pl.f', '{}/src/models/xmodel_kaon_pl.f'.format(LTANAPATH)))
+shutil.copy(prev_iter_dir+'/xmodel_kaon_pl.f', '{}/src/models/xmodel_kaon_pl.f'.format(LTANAPATH))
+files = os.listdir(prev_iter_dir+'/root/')
+for f in files:
+    print("Copying {} to {}".format(prev_iter_dir+'/root/'+f, OUTPATH))
+    shutil.copy(prev_iter_dir+'/root/'+f, OUTPATH)
+files = os.listdir(prev_iter_dir+'/json/')
+for f in files:
+    print("Copying {} to {}".format(prev_iter_dir+'/json/'+f, OUTPATH))
+    shutil.copy(prev_iter_dir+'/json/'+f, OUTPATH)
 
 prev_iter_root = foutroot.replace(OUTPATH,prev_iter_dir+"/root")
 prev_iter_json = foutjson.replace(OUTPATH,prev_iter_dir+"/json")
@@ -376,71 +421,65 @@ sys.path.append("plotting")
 from binned import plot_binned
 
 plot_binned(t_bins, phi_bins, histlist, phisetlist, inpDict, yieldDict, ratioDict, aveDict)
-notify_email(email_address="trotta@cua.edu")
+#notify_email(email_address="trotta@cua.edu")
 
 if DEBUG:
     show_pdf_with_evince(outputpdf.replace("{}_".format(ParticleType),"{}_binned_".format(ParticleType)))
 output_file_lst.append(outputpdf.replace("{}_".format(ParticleType),"{}_binned_".format(ParticleType)))    
 
 # Save histograms to root file
-# Check that root file doesnt already exist    
-if not os.path.exists(foutroot):
-#if os.path.exists(foutroot):    
-    for hist in histlist:
-        print("\nUpdating simc {} histograms in {}".format(hist["phi_setting"],foutroot))
-        # Loop through all keys,values of dictionary
-        for i, (key, val) in enumerate(hist.items()):
-            # Progress bar
-            Misc.progressBar(i, len(hist.items())-1,bar_length=25)
-            if "G_data_eff" in key:
-                hist_to_root(val, foutroot, "{}/data".format(hist["phi_setting"]))            
-            if is_hist(val):
-                if "ratio" in key:
-                    hist_to_root(val, foutroot, "{}/yield".format(hist["phi_setting"]))
-                if "SIMC" in key:
-                    if "yield" in key:
-                        hist_to_root(val, foutroot, "{}/yield".format(hist["phi_setting"]))                        
-                    elif "bin" in key:
-                        hist_to_root(val, foutroot, "{}/bins".format(hist["phi_setting"]))
-                    elif "totevts" in key:
-                        hist_to_root(val, foutroot, "{}/yield".format(hist["phi_setting"]))
-                    else:
-                        hist_to_root(val, foutroot, "{}/simc".format(hist["phi_setting"]))
+for hist in histlist:
+    print("\nUpdating simc {} histograms in {}".format(hist["phi_setting"],foutroot))
+    # Loop through all keys,values of dictionary
+    for i, (key, val) in enumerate(hist.items()):
+        # Progress bar
+        Misc.progressBar(i, len(hist.items())-1,bar_length=25)
+        if "G_data_eff" in key:
+            hist_to_root(val, foutroot, "{}/data".format(hist["phi_setting"]))            
+        if is_hist(val):
+            if "ratio" in key:
+                continue
+            if "SIMC" in key:
+                if "yield" in key:
+                    continue
+                elif "bin" in key:
+                    continue
+                elif "totevts" in key:
+                    continue
+                else:
+                    hist_to_root(val, foutroot, "{}/simc".format(hist["phi_setting"]))
 
-    # Open the ROOT file
-    root_file = TFile.Open(foutroot, "UPDATE")
+# Open the ROOT file
+root_file = TFile.Open(foutroot, "UPDATE")
 
-    # Check if the file was opened successfully
-    if root_file.IsOpen():
-        # Close the file
-        root_file.Close()
-        print("\nThe root file {} has been successfully closed.".format(foutroot))
-    else:
-        print("\nError: Unable to close the root file {}.".format(foutroot))
+# Check if the file was opened successfully
+if root_file.IsOpen():
+    # Close the file
+    root_file.Close()
+    print("\nThe root file {} has been successfully closed.".format(foutroot))
+else:
+    print("\nError: Unable to close the root file {}.".format(foutroot))
 output_file_lst.append(foutroot)
 
 # Create combined dictionary of all non-histogram information
-if not os.path.exists(foutjson):
-#if os.path.exists(foutjson):
-    # Create combined dictionary of all non-histogram information        
-    combineDict = {}
-    combineDict.update({"inpDict" : inpDict})
-    tmp_lst = []
-    for hist in histlist:
-        print("\nSaving {} information to {}".format(hist["phi_setting"],foutjson))
-        tmp_dict = {}
-        for i, (key, val) in enumerate(hist.items()):
-            # Progress bar
-            Misc.progressBar(i, len(hist.items())-1,bar_length=25)
-            if not is_root_obj(val):
-                tmp_dict[key] = val
-        tmp_lst.append(tmp_dict)
-    combineDict.update({ "histlist" : tmp_lst})
+combineDict = {}
+combineDict.update({"inpDict" : inpDict})
+tmp_lst = []
+for hist in histlist:
+    print("\nSaving {} information to {}".format(hist["phi_setting"],foutjson))
+    tmp_dict = {}
+    for i, (key, val) in enumerate(hist.items()):
+        # Progress bar
+        Misc.progressBar(i, len(hist.items())-1,bar_length=25)
+        if not is_root_obj(val):
+            tmp_dict[key] = val
+    tmp_lst.append(tmp_dict)
+combineDict.update({ "histlist" : tmp_lst})
 
-    # Save combined dictionary to json file
-    # Open the file in write mode and use json.dump() to save the dictionary to JSON
-    with open(foutjson, 'w') as f_json:
-        json.dump(combineDict, f_json, default=custom_encoder)
+# Save combined dictionary to json file
+# Open the file in write mode and use json.dump() to save the dictionary to JSON
+with open(foutjson, 'w') as f_json:
+    json.dump(combineDict, f_json, default=custom_encoder)
 output_file_lst.append(foutjson)
 
 from physics_lists import create_lists
@@ -448,22 +487,17 @@ create_lists(aveDict, yieldDict, histlist, inpDict, phisetlist, output_file_lst)
 
 # Redefinition from above, but should be the same! This is just to stay consistent with main.py
 # ***Parameter files from last and this iteration!***
-old_param_file = '{}/{}/{}/parameters/par.{}_Q{}W{}.dat'.format(CACHEPATH, USER, closest_date, ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""))
-try:
-    cut_summary_lst += "\nUnsep Parameterization for {}...".format(closest_date)
-    with open(old_param_file, 'r') as file:
-        for line in file:
-            cut_summary_lst += line
-    cut_summary_lst += "\nUnsep Parameterization for {}...".format(formatted_date)
-    with open(new_param_file, 'r') as file:
-        for line in file:
-            cut_summary_lst += line            
-except FileNotFoundError:
-    print('''
-    \n\n
-    File not found!
-    Assuming first iteration!
-    ''')
+# FIX BELOW!!!
+old_param_file = '{}/parameters/par.{}_Q{}W{}.dat'.format(prev_iter_dir, pol_str, Q2.replace("p",""), W.replace("p",""))
+
+cut_summary_lst += "\nUnsep Parameterization for {}...".format(closest_date)
+with open(old_param_file, 'r') as file:
+    for line in file:
+        cut_summary_lst += line
+cut_summary_lst += "\nUnsep Parameterization for {}...".format(formatted_date)
+with open(new_param_file, 'r') as file:
+    for line in file:
+        cut_summary_lst += line            
     
 print("\n\n")
 print("="*25)
@@ -519,18 +553,20 @@ if EPSSET == "high":
         show_pdf_with_evince(OUTPATH+"/{}_xsects_Q{}W{}.pdf".format(ParticleType, Q2, W))        
     output_file_lst.append(OUTPATH+"/{}_xsects_Q{}W{}.pdf".format(ParticleType, Q2, W))
     output_file_lst.append(OUTPATH+"/{}_lt_fit_Q{}W{}.pdf".format(ParticleType, Q2, W))
-
     
     # Save sep and unsep values from current iteration
     sep_file = '{}/xsects/x_sep.{}_Q{}W{}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""))
     output_file_lst.append(sep_file)
-# Save for high and low eps
-unsep_file = '{}/xsects/x_unsep.{}_Q{}W{}_{:.0f}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""), float(EPSVAL)*100)
-output_file_lst.append(unsep_file)    
-avek_file = '{}/averages/avek.Q{}W{}.dat'.format(ParticleType, Q2.replace("p",""), W.replace("p",""))
-output_file_lst.append(avek_file)
-aver_file = '{}/averages/aver.{}_Q{}W{}_{:.0f}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""), float(EPSVAL)*100)
-output_file_lst.append(aver_file)
+    unsep_lo_file = '{}/xsects/x_unsep.{}_Q{}W{}_{:.0f}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""), float(LOEPS)*100)
+    output_file_lst.append(unsep_lo_file)
+    unsep_hi_file = '{}/xsects/x_unsep.{}_Q{}W{}_{:.0f}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""), float(HIEPS)*100)
+    output_file_lst.append(unsep_hi_file)        
+    avek_file = '{}/averages/avek.Q{}W{}.dat'.format(ParticleType, Q2.replace("p",""), W.replace("p",""))
+    output_file_lst.append(avek_file)
+    aver_lo_file = '{}/averages/aver.{}_Q{}W{}_{:.0f}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""), float(LOEPS)*100)
+    output_file_lst.append(aver_lo_file)
+    aver_hi_file = '{}/averages/aver.{}_Q{}W{}_{:.0f}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""), float(HIEPS)*100)
+    output_file_lst.append(aver_hi_file)    
 
 ##############################
 # Step 8 of the lt_analysis: #

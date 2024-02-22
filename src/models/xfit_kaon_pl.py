@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2024-02-17 00:47:15 trottar"
+# Time-stamp: "2024-02-21 19:17:08 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -40,7 +40,9 @@ def fun_Sig_L(x, par):
     tt = abs(x[0])
     qq = abs(x[1])
     #print("Calculating function for func_SigL...\nQ2={:.1e}, t={:.3e}\npar=({:.2e}, {:.2e}, {:.2e}, {:.2e})\n\n".format(qq, tt, *par))
-    f = (par[0]+par[1]*math.log(qq)) * math.exp((par[2]+par[3]*math.log(qq)) * (abs(tt)))
+    # RLT (2/19/2024): Adding a 0.2 term to t dependence to bring down the extreme slope at high t
+    #f = (par[0]+par[1]*math.log(qq)) * math.exp((par[2]+par[3]*math.log(qq)) * (abs(tt)))
+    f = (par[0]+par[1]*math.log(qq)) * math.exp((par[2]+par[3]*math.log(qq)) * (abs(tt)+0.2))
     return f
 
 ###############################################################################################################################################
@@ -53,9 +55,14 @@ def fun_Sig_T(x, par):
     ftav = (abs(tt)-tav)/tav
     #print("Calculating function for func_SigT...\nQ2={:.1e}, t={:.3e}\npar=({:.2e}, {:.2e}, {:.2e}, {:.2e})\n\n".format(qq, tt, *par))
     # RLT (2/15/2024): Removing t dependence from sigT because it seems
-    #                  to be driving poor sep xsects results    
+    #                  to be driving poor sep xsects results
+    # RLT (2/20/2024): Added 1/Q^4 term to dampen sigT
+    # RLT (2/21/2024): Reintroducing t-dependence
+    # RLT (2/21/2024): Using global analysis sig T model and params (https://journals.aps.org/prc/pdf/10.1103/PhysRevC.85.018202)
     #f = par[0]+par[1]*math.log(qq)+(par[2]+par[3]*math.log(qq)) * ftav
-    f = par[0]+par[1]*math.log(qq)
+    #f = par[0]+par[1]*math.log(qq)
+    #f = par[0]*math.log(qq)+par[1]/(qq**2)
+    f = par[0] / (1 + par[1]*qq)
     return f
 
 ###############################################################################################################################################

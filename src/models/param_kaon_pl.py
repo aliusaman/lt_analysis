@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2024-02-16 18:34:07 trottar"
+# Time-stamp: "2024-02-21 19:16:20 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -55,11 +55,17 @@ def iterWeight(arg_str):
     
     #sigl = (p1 + p2 * math.log(q2_gev)) * math.exp((p3 + p4 * math.log(q2_gev)) * (abs(t_gev) - 0.2))
     # RLT (10/12/2023): Removed 0.2 to keep things as simple as possible for initial start parameterization
-    sigl = (p1 + p2 * math.log(q2_gev)) * math.exp((p3 + p4 * math.log(q2_gev)) * (abs(t_gev)))
+    # RLT (2/19/2024): Adding a 0.2 term to t dependence to bring down the extreme slope at high t
+    #sigl = (p1 + p2 * math.log(q2_gev)) * math.exp((p3 + p4 * math.log(q2_gev)) * (abs(t_gev)))
+    sigl = (p1 + p2 * math.log(q2_gev)) * math.exp((p3 + p4 * math.log(q2_gev)) * (abs(t_gev)+0.2))
     # RLT (2/15/2024): Removing t dependence from sigT because it seems
-    #                  to be driving poor sep xsects results    
+    #                  to be driving poor sep xsects results
+    # RLT (2/20/2024): Added 1/Q^4 term to dampen sigT
+    # RLT (2/21/2024): Using global analysis sig T model and params (https://journals.aps.org/prc/pdf/10.1103/PhysRevC.85.018202)
     #sigt = p5 + p6 * math.log(q2_gev) + (p7 + p8 * math.log(q2_gev)) * ftav
-    sigt = p5 + p6 * math.log(q2_gev)
+    #sigt = p5 + p6 * math.log(q2_gev)
+    #sigt = p5 * math.log(q2_gev) + p6 / (q2_gev**2)
+    sigt = p5 / (1 + p6*q2_gev)
     siglt = (p9 * math.exp(p10 * abs(t_gev)) + p11 / abs(t_gev)) * math.sin(thetacm_sim)
     # RLT (1/2/2024): Need to have 16 parameters (4 for L/T/LT/TT) for the
     #                 xfit_in_t.py script to work. LT/TT are zeros

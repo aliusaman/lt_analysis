@@ -73,8 +73,8 @@ formatted_date=$(date +H%HM%MS%S_%Y%B%d)
 # HARD CODED #
 ##############
 
-DEBUG="False" # Flag for no plot splash
-#DEBUG="True" # Flag for plot splash
+#DEBUG="False" # Flag for no plot splash
+DEBUG="True" # Flag for plot splash
 
 if [[ $p_flag != "true" ]]; then
     ParticleType="kaon"
@@ -247,11 +247,8 @@ do
 		    echo "Data Run Numbers: [${data_center_tmp[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.1838
-		else
-		    EPSVAL=0.5291
-		fi
+		LOEPS=0.1838
+		HIEPS=0.5291
 		KIN="Q5p5W3p02_${EPSILON}e"
 	    fi
 
@@ -290,11 +287,8 @@ do
 		    echo "Data Run Numbers: [${data_center_tmp[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.4805
-		else
-		    EPSVAL=0.7148
-		fi
+		LOEPS=0.4805
+		HIEPS=0.7148
 		KIN="Q4p4W2p74_${EPSILON}e"
 	    fi
 
@@ -333,11 +327,8 @@ do
 		    echo "Data Run Numbers: [${data_center_tmp[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.3935
-		else
-		    EPSVAL=0.6668
-		fi
+		LOEPS=0.3935
+		HIEPS=0.6668
 		KIN="Q3p0W3p14_${EPSILON}e"
 	    fi
 
@@ -376,11 +367,8 @@ do
 		    echo "Data Run Numbers: [${data_center_tmp[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.5736
-		else
-		    EPSVAL=0.8791
-		fi
+		LOEPS=0.5736
+		HIEPS=0.8791
 		KIN="Q3p0W2p32_${EPSILON}e"
 	    fi
 
@@ -419,11 +407,8 @@ do
 		    echo "Data Run Numbers: [${data_center_tmp[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.2477
-		else
-		    EPSVAL=0.7864
-		fi
+		LOEPS=0.2477
+		HIEPS=0.7864
 		KIN="Q2p1W2p95_${EPSILON}e"
 	    fi
 
@@ -462,11 +447,8 @@ do
 		    echo "Data Run Numbers: [${data_center_tmp[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.4515
-		else
-		    EPSVAL=0.6979
-		fi
+		LOEPS=0.4515
+		HIEPS=0.6979
 		KIN="Q0p5W2p40_${EPSILON}e"
 	    fi
 	    ##############
@@ -660,20 +642,33 @@ done
 # tbins should not exceed 8 (major drop in statistics)
 # TMIN should not equal zero (unless calc_xsect.f is adapted)
 # Make sure 3 sig figs (no more)
+
 if [[ $Q2 = "2p1" && $W = "2p95" ]]; then
     # Q2=2p1, W=2p95
     NumtBins=3
     NumPhiBins=10
     TMIN=0.100
     TMAX=0.600
+elif [[ $Q2 = "3p0" && $W = "2p32" ]]; then
+    # Q2=3p0, W=2p32
+    NumtBins=5
+    NumPhiBins=10
+    TMIN=0.100
+    TMAX=0.990
 elif [[ $Q2 = "3p0" && $W = "3p14" ]]; then
     # Q2=3p0, W=3p14
-    NumtBins=8
+    NumtBins=5
     NumPhiBins=16
+    TMIN=0.100
+    TMAX=0.850
+elif [[ $Q2 = "4p4" && $W = "2p74" ]]; then
+    # Q2=4p4, W=2p74
+    NumtBins=2
+    NumPhiBins=8
     TMIN=0.001
-    TMAX=0.990
-elif [[ $Q2 = "5p5" && $W = "3p02" ]]; then    
-    # Q2=5p5, W=3.02
+    TMAX=1.300    
+elif [[ $Q2 = "5p5" && $W = "3p02" ]]; then
+    # Q2=5p5, W=3p02
     NumtBins=2
     NumPhiBins=8
     TMIN=0.001
@@ -782,11 +777,8 @@ if [[ $i_flag != "true" ]]; then
 		    echo "Data Run Numbers: [${data_center_tmp[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.1838
-		else
-		    EPSVAL=0.5291
-		fi
+		LOEPS=0.1838
+		HIEPS=0.5291
 		KIN="Q5p5W3p02_${EPSILON}e"
 	    fi
 
@@ -825,11 +817,8 @@ if [[ $i_flag != "true" ]]; then
 		    echo "Data Run Numbers: [${data_center_tmp[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.4805
-		else
-		    EPSVAL=0.7148
-		fi
+		LOEPS=0.4805
+		HIEPS=0.7148
 		KIN="Q4p4W2p74_${EPSILON}e"
 	    fi
 
@@ -868,11 +857,8 @@ if [[ $i_flag != "true" ]]; then
 		    echo "Data Run Numbers: [${data_center_tmp[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.3935
-		else
-		    EPSVAL=0.6668
-		fi
+		LOEPS=0.3935
+		HIEPS=0.6668
 		KIN="Q3p0W3p14_${EPSILON}e"
 	    fi
 
@@ -911,11 +897,8 @@ if [[ $i_flag != "true" ]]; then
 		    echo "Data Run Numbers: [${data_center_tmp[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.5736
-		else
-		    EPSVAL=0.8791
-		fi
+		LOEPS=0.5736
+		HIEPS=0.8791
 		KIN="Q3p0W2p32_${EPSILON}e"
 	    fi
 
@@ -954,11 +937,8 @@ if [[ $i_flag != "true" ]]; then
 		    echo "Data Run Numbers: [${data_center_tmp[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.2477
-		else
-		    EPSVAL=0.7864
-		fi
+		LOEPS=0.2477
+		HIEPS=0.7864
 		KIN="Q2p1W2p95_${EPSILON}e"
 	    fi
 
@@ -997,11 +977,8 @@ if [[ $i_flag != "true" ]]; then
 		    echo "Data Run Numbers: [${data_center_tmp[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.4515
-		else
-		    EPSVAL=0.6979
-		fi
+		LOEPS=0.4515
+		HIEPS=0.6979
 		KIN="Q0p5W2p40_${EPSILON}e"
 	    fi
 	    ##############
@@ -1393,7 +1370,7 @@ if [[ $i_flag != "true" ]]; then
 	fi
 	
 	if [ ${#data_right[@]} -eq 0 ]; then
-	    python3 main.py ${KIN} ${W} ${Q2} ${EPSVAL} ${OutDATAFilename} ${OutDUMMYFilename} ${OutFullAnalysisFilename} ${TMIN} ${TMAX} ${NumtBins} ${NumPhiBins} "0" "${data_left[*]}" "${data_center[*]}" "0" ${TotDataEffChargeValLeft} ${TotDataEffChargeValCenter} "0" ${TotDummyEffChargeValLeft} ${TotDummyEffChargeValCenter} "0" ${TotDataEffChargeErrLeft} ${TotDataEffChargeErrCenter} "0" ${TotDummyEffChargeErrLeft} ${TotDummyEffChargeErrCenter} "0" "${DataEffValLeft[*]}" "${DataEffValCenter[*]}" "0" "${DataEffErrLeft[*]}" "${DataEffErrCenter[*]}" ${EffData} ${ParticleType} $j "0" "${DatapThetaValLeft[*]}" "${DatapThetaValCenter[*]}" "0" "${DataEbeamValLeft[*]}" "${DataEbeamValCenter[*]}" ${POL} ${formatted_date} ${DEBUG}
+	    python3 main.py ${KIN} ${W} ${Q2} ${LOEPS} ${HIEPS} ${OutDATAFilename} ${OutDUMMYFilename} ${OutFullAnalysisFilename} ${TMIN} ${TMAX} ${NumtBins} ${NumPhiBins} "0" "${data_left[*]}" "${data_center[*]}" "0" ${TotDataEffChargeValLeft} ${TotDataEffChargeValCenter} "0" ${TotDummyEffChargeValLeft} ${TotDummyEffChargeValCenter} "0" ${TotDataEffChargeErrLeft} ${TotDataEffChargeErrCenter} "0" ${TotDummyEffChargeErrLeft} ${TotDummyEffChargeErrCenter} "0" "${DataEffValLeft[*]}" "${DataEffValCenter[*]}" "0" "${DataEffErrLeft[*]}" "${DataEffErrCenter[*]}" ${EffData} ${ParticleType} $j "0" "${DatapThetaValLeft[*]}" "${DatapThetaValCenter[*]}" "0" "${DataEbeamValLeft[*]}" "${DataEbeamValCenter[*]}" ${POL} ${formatted_date} ${DEBUG}
 	    # Check the exit status of the Python script
 	    if [ $? -ne 0 ]; then
 		echo
@@ -1403,7 +1380,7 @@ if [[ $i_flag != "true" ]]; then
 		exit 1
 	    fi
 	else
-	    python3 main.py ${KIN} ${W} ${Q2} ${EPSVAL} ${OutDATAFilename} ${OutDUMMYFilename} ${OutFullAnalysisFilename} ${TMIN} ${TMAX} ${NumtBins} ${NumPhiBins} "${data_right[*]}" "${data_left[*]}" "${data_center[*]}" ${TotDataEffChargeValRight} ${TotDataEffChargeValLeft} ${TotDataEffChargeValCenter} ${TotDummyEffChargeValRight} ${TotDummyEffChargeValLeft} ${TotDummyEffChargeValCenter} ${TotDataEffChargeErrRight} ${TotDataEffChargeErrLeft} ${TotDataEffChargeErrCenter} ${TotDummyEffChargeErrRight} ${TotDummyEffChargeErrLeft} ${TotDummyEffChargeErrCenter} "${DataEffValRight[*]}" "${DataEffValLeft[*]}" "${DataEffValCenter[*]}" "${DataEffErrRight[*]}" "${DataEffErrLeft[*]}" "${DataEffErrCenter[*]}" ${EffData} ${ParticleType} $j "${DatapThetaValRight[*]}" "${DatapThetaValLeft[*]}" "${DatapThetaValCenter[*]}" "${DataEbeamValRight[*]}" "${DataEbeamValLeft[*]}" "${DataEbeamValCenter[*]}" ${POL} ${formatted_date} ${DEBUG}
+	    python3 main.py ${KIN} ${W} ${Q2} ${LOEPS} ${HIEPS} ${OutDATAFilename} ${OutDUMMYFilename} ${OutFullAnalysisFilename} ${TMIN} ${TMAX} ${NumtBins} ${NumPhiBins} "${data_right[*]}" "${data_left[*]}" "${data_center[*]}" ${TotDataEffChargeValRight} ${TotDataEffChargeValLeft} ${TotDataEffChargeValCenter} ${TotDummyEffChargeValRight} ${TotDummyEffChargeValLeft} ${TotDummyEffChargeValCenter} ${TotDataEffChargeErrRight} ${TotDataEffChargeErrLeft} ${TotDataEffChargeErrCenter} ${TotDummyEffChargeErrRight} ${TotDummyEffChargeErrLeft} ${TotDummyEffChargeErrCenter} "${DataEffValRight[*]}" "${DataEffValLeft[*]}" "${DataEffValCenter[*]}" "${DataEffErrRight[*]}" "${DataEffErrLeft[*]}" "${DataEffErrCenter[*]}" ${EffData} ${ParticleType} $j "${DatapThetaValRight[*]}" "${DatapThetaValLeft[*]}" "${DatapThetaValCenter[*]}" "${DataEbeamValRight[*]}" "${DataEbeamValLeft[*]}" "${DataEbeamValCenter[*]}" ${POL} ${formatted_date} ${DEBUG}
 	    # Check the exit status of the Python script
 	    if [ $? -ne 0 ]; then
 		echo
@@ -1513,11 +1490,8 @@ else
 		    echo "Data Run Numbers: [${data_center[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.1838
-		else
-		    EPSVAL=0.5291
-		fi
+		LOEPS=0.1838
+		HIEPS=0.5291
 		KIN="Q5p5W3p02_${EPSILON}e"
 	    fi
 
@@ -1556,11 +1530,8 @@ else
 		    echo "Data Run Numbers: [${data_center[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.4805
-		else
-		    EPSVAL=0.7148
-		fi
+		LOEPS=0.4805
+		HIEPS=0.7148
 		KIN="Q4p4W2p74_${EPSILON}e"
 	    fi
 
@@ -1599,11 +1570,8 @@ else
 		    echo "Data Run Numbers: [${data_center[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.3935
-		else
-		    EPSVAL=0.6668
-		fi
+		LOEPS=0.3935
+		HIEPS=0.6668
 		KIN="Q3p0W3p14_${EPSILON}e"
 	    fi
 
@@ -1642,11 +1610,8 @@ else
 		    echo "Data Run Numbers: [${data_center[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.5736
-		else
-		    EPSVAL=0.8791
-		fi
+		LOEPS=0.5736
+		HIEPS=0.8791
 		KIN="Q3p0W2p32_${EPSILON}e"
 	    fi
 
@@ -1685,11 +1650,8 @@ else
 		    echo "Data Run Numbers: [${data_center[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.2477
-		else
-		    EPSVAL=0.7864
-		fi
+		LOEPS=0.2477
+		HIEPS=0.7864
 		KIN="Q2p1W2p95_${EPSILON}e"
 	    fi
 
@@ -1728,11 +1690,8 @@ else
 		    echo "Data Run Numbers: [${data_center[@]}]"
 		    echo
 		fi
-		if [[ ${EPSILON} == "low" ]]; then
-		    EPSVAL=0.4515
-		else
-		    EPSVAL=0.6979
-		fi
+		LOEPS=0.4515
+		HIEPS=0.6979
 		KIN="Q0p5W2p40_${EPSILON}e"
 	    fi
 	    ##############
@@ -1755,7 +1714,7 @@ else
 	    echo "Finding new simc weight for for high epsilon..."
 	fi
 
-	python3 main_iter.py ${KIN} ${W} ${Q2} ${EPSVAL} ${ParticleType} $j ${POL} ${OutFullAnalysisFilename} ${formatted_date} ${NumtBins} ${NumPhiBins} ${DEBUG}
+	python3 main_iter.py ${KIN} ${W} ${Q2} ${LOEPS} ${HIEPS} ${ParticleType} $j ${POL} ${OutFullAnalysisFilename} ${formatted_date} ${NumtBins} ${NumPhiBins} ${DEBUG}
 
 	# Check the exit status of the Python script
 	if [ $? -ne 0 ]; then

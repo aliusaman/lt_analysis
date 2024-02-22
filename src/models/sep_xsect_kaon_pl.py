@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2024-02-16 18:25:20 trottar"
+# Time-stamp: "2024-02-21 19:19:29 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -31,7 +31,9 @@ def import_model(inp_model, arg_str):
     def sig_L(*par):
         if inp_model == "sigL":
             print("Calculating function for sigL...\nQ2={:.4e}, t={:.4e}\npar=({:.4e}, {:.4e}, {:.4e}, {:.4e})".format(qq, tt, *par))
-            f = (par[0]+par[1]*math.log(qq)) * math.exp((par[2]+par[3]*math.log(qq)) * (abs(tt)))
+            # RLT (2/19/2024): Adding a 0.2 term to t dependence to bring down the extreme slope at high t
+            #f = (par[0]+par[1]*math.log(qq)) * math.exp((par[2]+par[3]*math.log(qq)) * (abs(tt)))
+            f = (par[0]+par[1]*math.log(qq)) * math.exp((par[2]+par[3]*math.log(qq)) * (abs(tt)+0.2))
             return f
 
     # Function for SigT
@@ -42,8 +44,12 @@ def import_model(inp_model, arg_str):
             ftav = (abs(tt)-tav)/tav
             # RLT (2/15/2024): Removing t dependence from sigT because it seems
             #                  to be driving poor sep xsects results
+            # RLT (2/20/2024): Added 1/Q^4 term to dampen sigT
+            # RLT (2/21/2024): Using global analysis sig T model and params (https://journals.aps.org/prc/pdf/10.1103/PhysRevC.85.018202)            
             #f = par[0]+par[1]*math.log(qq)+(par[2]+par[3]*math.log(qq)) * ftav
-            f = par[0]+par[1]*math.log(qq)
+            #f = par[0]+par[1]*math.log(qq)
+            #f = par[0]*math.log(qq)+par[1]/(qq**2)
+            f = par[0] / (1 + par[1]*qq)
             return f
 
     # Function for SigLT

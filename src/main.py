@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2024-02-17 21:18:35 trottar"
+# Time-stamp: "2024-02-21 13:27:58 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -41,8 +41,8 @@ from utility import show_pdf_with_evince, create_dir, is_root_obj, is_hist, hist
 ##################################################################################################################################################
 # Check the number of arguments provided to the script
 
-if len(sys.argv)-1!=44:
-    print("!!!!! ERROR !!!!!\n Expected 44 arguments\n Usage is with - KIN W Q2 EPSVAL OutDATAFilename OutDUMMYFilename OutFullAnalysisFilename tmin tmax NumtBins NumPhiBins runNumRight runNumLeft runNumCenter data_charge_right data_charge_left data_charge_center dummy_charge_right dummy_charge_left dummy_charge_center data_charge_err_right data_charge_err_left data_charge_err_center dummy_charge_err_right dummy_charge_err_left dummy_charge_err_center InData_efficiency_right InData_efficiency_left InData_efficiency_center InData_error_efficiency_right InData_error_efficiency_left InData_error_efficiency_center efficiency_table ParticleType EPSSET pThetaValRight pThetaValLeft pThetaValCenter EbeamValRight EbeamValLeft EbeamValCenter POL formatted_date inp_debug\n!!!!! ERROR !!!!!")
+if len(sys.argv)-1!=45:
+    print("!!!!! ERROR !!!!!\n Expected 45 arguments\n Usage is with - KIN W Q2 LOEPS HIEPS OutDATAFilename OutDUMMYFilename OutFullAnalysisFilename tmin tmax NumtBins NumPhiBins runNumRight runNumLeft runNumCenter data_charge_right data_charge_left data_charge_center dummy_charge_right dummy_charge_left dummy_charge_center data_charge_err_right data_charge_err_left data_charge_err_center dummy_charge_err_right dummy_charge_err_left dummy_charge_err_center InData_efficiency_right InData_efficiency_left InData_efficiency_center InData_error_efficiency_right InData_error_efficiency_left InData_error_efficiency_center efficiency_table ParticleType EPSSET pThetaValRight pThetaValLeft pThetaValCenter EbeamValRight EbeamValLeft EbeamValCenter POL formatted_date inp_debug\n!!!!! ERROR !!!!!")
     sys.exit(1)
 
 ##################################################################################################################################################    
@@ -51,47 +51,48 @@ if len(sys.argv)-1!=44:
 kinematics = sys.argv[1].split("_")
 W = sys.argv[2]
 Q2 = sys.argv[3]
-EPSVAL = sys.argv[4]
-InDATAFilename = sys.argv[5]
-InDUMMYFilename = sys.argv[6]
-OutFilename = sys.argv[7]
-tmin = float(sys.argv[8])
-tmax = float(sys.argv[9])
-NumtBins = int(sys.argv[10])
-NumPhiBins = int(sys.argv[11])
-runNumRight = sys.argv[12]
-runNumLeft = sys.argv[13]
-runNumCenter = sys.argv[14]
-data_charge_right = float(sys.argv[15])
-data_charge_left = float(sys.argv[16])
-data_charge_center = float(sys.argv[17])
-dummy_charge_right = float(sys.argv[18])
-dummy_charge_left = float(sys.argv[19])
-dummy_charge_center = float(sys.argv[20])
-data_charge_err_right = float(sys.argv[21])
-data_charge_err_left = float(sys.argv[22])
-data_charge_err_center = float(sys.argv[23])
-dummy_charge_err_right = float(sys.argv[24])
-dummy_charge_err_left = float(sys.argv[25])
-dummy_charge_err_center = float(sys.argv[26])
-InData_efficiency_right = sys.argv[27]
-InData_efficiency_left = sys.argv[28]
-InData_efficiency_center = sys.argv[29]
-InData_error_efficiency_right = sys.argv[30]
-InData_error_efficiency_left = sys.argv[31]
-InData_error_efficiency_center = sys.argv[32]
-efficiency_table = sys.argv[33]
-ParticleType = sys.argv[34]
-EPSSET = sys.argv[35]
-pThetaValRight = list(sys.argv[36].split(" "))
-pThetaValLeft = list(sys.argv[37].split(" "))
-pThetaValCenter = list(sys.argv[38].split(" "))
-EbeamValRight = list(sys.argv[39].split(" "))
-EbeamValLeft = list(sys.argv[40].split(" "))
-EbeamValCenter = list(sys.argv[41].split(" "))
-POL = sys.argv[42]
-formatted_date = sys.argv[43]
-inp_debug =  sys.argv[44]
+LOEPS = sys.argv[4]
+HIEPS = sys.argv[5]
+InDATAFilename = sys.argv[6]
+InDUMMYFilename = sys.argv[7]
+OutFilename = sys.argv[8]
+tmin = float(sys.argv[9])
+tmax = float(sys.argv[10])
+NumtBins = int(sys.argv[11])
+NumPhiBins = int(sys.argv[12])
+runNumRight = sys.argv[13]
+runNumLeft = sys.argv[14]
+runNumCenter = sys.argv[15]
+data_charge_right = float(sys.argv[16])
+data_charge_left = float(sys.argv[17])
+data_charge_center = float(sys.argv[18])
+dummy_charge_right = float(sys.argv[19])
+dummy_charge_left = float(sys.argv[20])
+dummy_charge_center = float(sys.argv[21])
+data_charge_err_right = float(sys.argv[22])
+data_charge_err_left = float(sys.argv[23])
+data_charge_err_center = float(sys.argv[24])
+dummy_charge_err_right = float(sys.argv[25])
+dummy_charge_err_left = float(sys.argv[26])
+dummy_charge_err_center = float(sys.argv[27])
+InData_efficiency_right = sys.argv[28]
+InData_efficiency_left = sys.argv[29]
+InData_efficiency_center = sys.argv[30]
+InData_error_efficiency_right = sys.argv[31]
+InData_error_efficiency_left = sys.argv[32]
+InData_error_efficiency_center = sys.argv[33]
+efficiency_table = sys.argv[34]
+ParticleType = sys.argv[35]
+EPSSET = sys.argv[36]
+pThetaValRight = list(sys.argv[37].split(" "))
+pThetaValLeft = list(sys.argv[38].split(" "))
+pThetaValCenter = list(sys.argv[39].split(" "))
+EbeamValRight = list(sys.argv[40].split(" "))
+EbeamValLeft = list(sys.argv[41].split(" "))
+EbeamValCenter = list(sys.argv[42].split(" "))
+POL = sys.argv[43]
+formatted_date = sys.argv[44]
+inp_debug =  sys.argv[45]
 
 if inp_debug == "False":
     DEBUG = False # Flag for no plot splash
@@ -106,6 +107,11 @@ else:
     print("ERROR: Invalid polarity...must be +1 or -1")
     sys.exit(2)
 
+if EPSSET == "low":
+    EPSVAL = LOEPS
+else:
+    EPSVAL = HIEPS
+    
 inpDict = {
     "kinematics" : kinematics,
     "W" : W,
@@ -233,7 +239,12 @@ WVal = float(W.replace("p","."))
 ##############
 # May need to adjust these for diamond plots to work
 # 2/7 seems to work for most Q2 of KaonLT 2018-19
-if Q2Val == 3.0:
+if Q2Val == 2.1:
+    inpDict["Q2min"] = Q2Val - (2/9)*Q2Val
+    inpDict["Q2max"] = Q2Val + (2/9)*Q2Val
+    inpDict["Wmin"] = WVal - (2/9)*WVal
+    inpDict["Wmax"] = WVal + (2/9)*WVal
+elif Q2Val == 3.0:
     inpDict["Q2min"] = Q2Val - (3/7)*Q2Val
     inpDict["Q2max"] = Q2Val + (3/7)*Q2Val
     inpDict["Wmin"] = WVal - (3/7)*WVal
@@ -243,11 +254,6 @@ elif Q2Val == 5.5:
     inpDict["Q2max"] = Q2Val + (3/8)*Q2Val
     inpDict["Wmin"] = WVal - (3/8)*WVal
     inpDict["Wmax"] = WVal + (3/8)*WVal
-elif Q2Val == 2.1:
-    inpDict["Q2min"] = Q2Val - (2/9)*Q2Val
-    inpDict["Q2max"] = Q2Val + (2/9)*Q2Val
-    inpDict["Wmin"] = WVal - (2/9)*WVal
-    inpDict["Wmax"] = WVal + (2/9)*WVal
 else:
     inpDict["Q2min"] = Q2Val - (2/7)*Q2Val
     inpDict["Q2max"] = Q2Val + (2/7)*Q2Val
@@ -507,49 +513,11 @@ sys.path.append("plotting")
 from binned import plot_binned
 
 plot_binned(t_bins, phi_bins, histlist, phisetlist, inpDict, yieldDict, ratioDict, aveDict)
-notify_email(email_address="trotta@cua.edu")
+#notify_email(email_address="trotta@cua.edu")
 
 if DEBUG:
     show_pdf_with_evince(outputpdf.replace("{}_".format(ParticleType),"{}_binned_".format(ParticleType)))
 output_file_lst.append(outputpdf.replace("{}_".format(ParticleType),"{}_binned_".format(ParticleType)))    
-
-'''
-# Save histograms to root file
-# Check that root file doesnt already exist    
-if not os.path.exists(foutroot):
-#if os.path.exists(foutroot):
-    for hist in histlist:
-        print("\nSaving {} histograms to {}".format(hist["phi_setting"],foutroot))
-        # Loop through all keggys,values of dictionary
-        for i, (key, val) in enumerate(hist.items()):
-            # Progress bar
-            Misc.progressBar(i, len(hist.items())-1,bar_length=25)
-            if "G_data_eff" in key:
-                hist_to_root(val, foutroot, "{}/data".format(hist["phi_setting"]))
-            if is_hist(val):
-                if "ratio" in key:
-                    hist_to_root(val, foutroot, "{}/yield".format(hist["phi_setting"]))
-                if "DATA" in key:
-                    if "yield" in key:
-                        hist_to_root(val, foutroot, "{}/yield".format(hist["phi_setting"]))                        
-                    elif "bin" in key:
-                        hist_to_root(val, foutroot, "{}/bins".format(hist["phi_setting"]))
-                    elif "totevts" in key:
-                        hist_to_root(val, foutroot, "{}/yield".format(hist["phi_setting"]))
-                    else:
-                        hist_to_root(val, foutroot, "{}/data".format(hist["phi_setting"]))
-                if "SIMC" in key:
-                    if "yield" in key:
-                        hist_to_root(val, foutroot, "{}/yield".format(hist["phi_setting"]))                        
-                    elif "bin" in key:
-                        hist_to_root(val, foutroot, "{}/bins".format(hist["phi_setting"]))
-                    elif "totevts" in key:
-                        hist_to_root(val, foutroot, "{}/yield".format(hist["phi_setting"]))
-                    else:
-                        hist_to_root(val, foutroot, "{}/simc".format(hist["phi_setting"]))
-                if "DUMMY" in key:
-                    hist_to_root(val, foutroot, "{}/dummy".format(hist["phi_setting"]))
-'''
 
 # Save histograms to root file
 # Check that root file doesnt already exist    
@@ -632,18 +600,11 @@ shutil.copy('{}/src/models/par_{}_Q{}W{}'.format(LTANAPATH, pol_str, Q2.replace(
 # ***Parameter file from last iteration!***
 # ***These old parameters are needed for this iteration. See README for more info on procedure!***
 old_param_file = '{}/src/{}/parameters/par.{}_Q{}W{}.dat'.format(LTANAPATH, ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""))
-try:
-    cut_summary_lst += "\n\nUnsep Parameterization for {}...\n".format(formatted_date)
-    with open(old_param_file, 'r') as file:
-        for line in file:
-            cut_summary_lst += line
-except FileNotFoundError:
-    print('''
-    \n\n
-    File not found!
-    Assuming first iteration!
-    ''')
-    
+cut_summary_lst += "\n\nUnsep Parameterization for {}...\n".format(formatted_date)
+with open(old_param_file, 'r') as file:
+    for line in file:
+        cut_summary_lst += line
+        
 print("\n\n")
 print("="*25)
 print("{} Epsilon Summary...".format(EPSSET.capitalize()),cut_summary_lst)
@@ -709,14 +670,17 @@ if EPSSET == "high":
     new_param_file = '{}/parameters/par.{}_Q{}W{}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""))
     output_file_lst.append(new_param_file) 
     sep_file = '{}/xsects/x_sep.{}_Q{}W{}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""))
-    output_file_lst.append(sep_file)
-# Save for high and low eps
-unsep_file = '{}/xsects/x_unsep.{}_Q{}W{}_{:.0f}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""), float(EPSVAL)*100)
-output_file_lst.append(unsep_file)
-avek_file = '{}/averages/avek.Q{}W{}.dat'.format(ParticleType, Q2.replace("p",""), W.replace("p",""))
-output_file_lst.append(avek_file)
-aver_file = '{}/averages/aver.{}_Q{}W{}_{:.0f}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""), float(EPSVAL)*100)
-output_file_lst.append(aver_file)
+    output_file_lst.append(sep_file)    
+    unsep_lo_file = '{}/xsects/x_unsep.{}_Q{}W{}_{:.0f}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""), float(LOEPS)*100)
+    output_file_lst.append(unsep_lo_file)
+    unsep_hi_file = '{}/xsects/x_unsep.{}_Q{}W{}_{:.0f}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""), float(HIEPS)*100)
+    output_file_lst.append(unsep_hi_file)        
+    avek_file = '{}/averages/avek.Q{}W{}.dat'.format(ParticleType, Q2.replace("p",""), W.replace("p",""))
+    output_file_lst.append(avek_file)
+    aver_lo_file = '{}/averages/aver.{}_Q{}W{}_{:.0f}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""), float(LOEPS)*100)
+    output_file_lst.append(aver_lo_file)
+    aver_hi_file = '{}/averages/aver.{}_Q{}W{}_{:.0f}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""), float(HIEPS)*100)
+    output_file_lst.append(aver_hi_file)    
 
 ##############################
 # Step 8 of the lt_analysis: #
