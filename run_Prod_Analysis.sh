@@ -67,14 +67,14 @@ done
 # - `+%Y` extracts the year.
 # - `+%B` extracts the full month name.
 # - `%d` extracts the day of the month.
-formatted_date=$(date +H%HM%MS%S_%Y%B%d)
+formatted_date=$(date +%Y%B%d_H%HM%MS%S)
 
 ##############
 # HARD CODED #
 ##############
 
-#DEBUG="False" # Flag for no plot splash
-DEBUG="True" # Flag for plot splash
+DEBUG="False" # Flag for no plot splash
+#DEBUG="True" # Flag for plot splash
 
 if [[ $p_flag != "true" ]]; then
     ParticleType="kaon"
@@ -660,7 +660,8 @@ elif [[ $Q2 = "3p0" && $W = "3p14" ]]; then
     NumtBins=5
     NumPhiBins=16
     TMIN=0.100
-    TMAX=0.850
+    #TMAX=0.850
+    TMAX=0.350
 elif [[ $Q2 = "4p4" && $W = "2p74" ]]; then
     # Q2=4p4, W=2p74
     NumtBins=2
@@ -997,6 +998,7 @@ if [[ $i_flag != "true" ]]; then
 	if [[ ${#data_right_tmp[@]} -ne 0 ]]; then
 	    echo
 	    echo "Calculating data total effective charge right..."
+	    python3 findEffectiveCharge.py ${EffData} "${data_right_tmp[*]}" ${ParticleType} # New line, it'll crash after this
 	    PYRIGHTSTRING=$(python3 findEffectiveCharge.py ${EffData} "${data_right_tmp[*]}" ${ParticleType})
 	    arr1=()
 	    arr2=()

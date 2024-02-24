@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2024-02-22 15:55:37 trottar"
+# Time-stamp: "2024-02-24 14:05:19 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -51,6 +51,15 @@ m_p = 0.93827231
 m_n = 0.93956541
 mkpl = 0.493677
 
+##############
+# HARD CODED #
+##############
+# Limit for finding new parameters (units of percent)
+par_lim = 0.2 # +/-20%
+##############
+##############
+##############
+
 ###############################################################################################################################################
 # Import separated xsects models
 
@@ -94,11 +103,13 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     nsep = TNtuple("nsep", "nsep", "sigl:sigl_e:sigt:sigt_e:siglt:siglt_e:sigtt:sigtt_e:chi:t:t_min:w:q2:thetacm")
     nsep.ReadFile(fn_sep)
 
+    '''
     print("Reading {}...".format(fn_sep))
     for entry in nsep:
         print("sigl: {}, sigl_e: {}, sigt: {}, sigt_e: {}, siglt: {}, siglt_e: {}, sigtt: {}, sigtt_e: {}, chi: {}, t: {}, t_min: {}, w: {}, q2: {}, thetacm: {}".format(
             entry.sigl, entry.sigl_e, entry.sigt, entry.sigt_e, entry.siglt, entry.siglt_e, entry.sigtt, entry.sigtt_e, entry.chi, entry.t, entry.t_min, entry.w, entry.q2, entry.thetacm
         ))
+    '''
 
     prv_par_vec = []
     para_file_in =  "{}/{}/{}/Q{}W{}/{}/parameters/par.{}_Q{}W{}.dat".format(CACHEPATH, USER, ParticleType, q2_set, w_set, dir_iter, \
@@ -186,12 +197,18 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     #f_sigL_pre.FixParameter(1, 0)
     #f_sigL_pre.FixParameter(2, 0)
     #f_sigL_pre.FixParameter(3, 0)
+    # Set range limit of used parameters
+    # Currently 10% range
+    f_sigL_pre.SetParLimits(0, l0-l0*par_lim, l0+l0*par_lim)
+    f_sigL_pre.SetParLimits(1, l1-l1*par_lim, l1+l1*par_lim)
+    f_sigL_pre.SetParLimits(2, l2-l2*par_lim, l2+l2*par_lim)
+    f_sigL_pre.SetParLimits(3, l3-l3*par_lim, l3+l3*par_lim)
     # Fixing sigL terms for testing
-    f_sigL_pre.FixParameter(0, l0)
-    f_sigL_pre.FixParameter(1, l1)
-    #f_sigL_pre.FixParameter(1, 0.0)
-    f_sigL_pre.FixParameter(2, l2)
-    f_sigL_pre.FixParameter(3, l3)
+    #f_sigL_pre.FixParameter(0, l0)
+    #f_sigL_pre.FixParameter(1, l1)
+    ##f_sigL_pre.FixParameter(1, 0.0)
+    #f_sigL_pre.FixParameter(2, l2)
+    #f_sigL_pre.FixParameter(3, l3)
     ##############
     ##############
     ##############    
@@ -247,12 +264,18 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     #f_sigL.FixParameter(1, 0)
     #f_sigL.FixParameter(2, 0)
     #f_sigL.FixParameter(3, 0)
+    # Set range limit of used parameters
+    # Currently 10% range
+    f_sigL.SetParLimits(0, l0-l0*par_lim, l0+l0*par_lim)
+    f_sigL.SetParLimits(1, l1-l1*par_lim, l1+l1*par_lim)
+    f_sigL.SetParLimits(2, l2-l2*par_lim, l2+l2*par_lim)
+    f_sigL.SetParLimits(3, l3-l3*par_lim, l3+l3*par_lim)    
     # Fixing sigL terms for testing
-    f_sigL.FixParameter(0, l0)
-    f_sigL.FixParameter(1, l1)
-    #f_sigL.FixParameter(1, 0.0)
-    f_sigL.FixParameter(2, l2)
-    f_sigL.FixParameter(3, l3)    
+    #f_sigL.FixParameter(0, l0)
+    #f_sigL.FixParameter(1, l1)
+    ##f_sigL.FixParameter(1, 0.0)
+    #f_sigL.FixParameter(2, l2)
+    #f_sigL.FixParameter(3, l3)    
     ##############
     ##############
     ##############    
@@ -330,9 +353,15 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     #f_sigT_pre.FixParameter(1, 0)
     f_sigT_pre.FixParameter(2, 0)
     f_sigT_pre.FixParameter(3, 0)
+    # Set range limit of used parameters
+    # Currently 10% range
+    f_sigT_pre.SetParLimits(0, t0-t0*par_lim, t0+t0*par_lim)
+    f_sigT_pre.SetParLimits(1, t1-t1*par_lim, t1+t1*par_lim)
+    #f_sigT_pre.SetParLimits(2, t2-t2*par_lim, t2+t2*par_lim)
+    #f_sigT_pre.SetParLimits(3, t3-t3*par_lim, t3+t3*par_lim)    
     # Fixing sigL terms for testing
-    f_sigT_pre.FixParameter(0, 20)
-    f_sigT_pre.FixParameter(1, t1)
+    ##f_sigT_pre.FixParameter(0, t0)
+    #f_sigT_pre.FixParameter(1, t1)
     ##############
     ##############
     ##############    
@@ -388,9 +417,15 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     #f_sigT.FixParameter(1, 0)
     f_sigT.FixParameter(2, 0)
     f_sigT.FixParameter(3, 0)
+    # Set range limit of used parameters
+    # Currently 10% range
+    f_sigT.SetParLimits(0, t0-t0*par_lim, t0+t0*par_lim)
+    f_sigT.SetParLimits(1, t1-t1*par_lim, t1+t1*par_lim)
+    #f_sigT.SetParLimits(2, t2-t2*par_lim, t2+t2*par_lim)
+    #f_sigT.SetParLimits(3, t3-t3*par_lim, t3+t3*par_lim)        
     # Fixing sigL terms for testing
-    f_sigT.FixParameter(0, 20)
-    f_sigT.FixParameter(1, t1)
+    ##f_sigT.FixParameter(0, t0)
+    #f_sigT.FixParameter(1, t1)
     ##############
     ##############
     ##############    
@@ -468,10 +503,16 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     #f_sigLT_pre.FixParameter(1, 0)
     #f_sigLT_pre.FixParameter(2, 0)
     f_sigLT_pre.FixParameter(3, 0)
+    # Set range limit of used parameters
+    # Currently 10% range
+    f_sigLT_pre.SetParLimits(0, lt0-lt0*par_lim, lt0+lt0*par_lim)
+    f_sigLT_pre.SetParLimits(1, lt1-lt1*par_lim, lt1+lt1*par_lim)
+    f_sigLT_pre.SetParLimits(2, lt2-lt2*par_lim, lt2+lt2*par_lim)
+    #f_sigLT_pre.SetParLimits(3, lt3-lt3*par_lim, lt3+lt3*par_lim)        
     # Fixing sigLT terms for testing
-    f_sigLT_pre.FixParameter(0, lt0)
-    f_sigLT_pre.FixParameter(1, lt1)
-    f_sigLT_pre.FixParameter(2, lt2)
+    #f_sigLT_pre.FixParameter(0, lt0)
+    #f_sigLT_pre.FixParameter(1, lt1)
+    #f_sigLT_pre.FixParameter(2, lt2)
     ##############
     ##############
     ##############    
@@ -531,10 +572,16 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     #f_sigLT.FixParameter(1, 0)
     #f_sigLT.FixParameter(2, 0)
     f_sigLT.FixParameter(3, 0)
+    # Set range limit of used parameters
+    # Currently 10% range
+    f_sigLT.SetParLimits(0, lt0-lt0*par_lim, lt0+lt0*par_lim)
+    f_sigLT.SetParLimits(1, lt1-lt1*par_lim, lt1+lt1*par_lim)
+    f_sigLT.SetParLimits(2, lt2-lt2*par_lim, lt2+lt2*par_lim)
+    #f_sigLT.SetParLimits(3, lt3-lt3*par_lim, lt3+lt3*par_lim)
     # Fixing sigLT terms for testing
-    f_sigLT.FixParameter(0, lt0)
-    f_sigLT.FixParameter(1, lt1)
-    f_sigLT.FixParameter(2, lt2)    
+    #f_sigLT.FixParameter(0, lt0)
+    #f_sigLT.FixParameter(1, lt1)
+    #f_sigLT.FixParameter(2, lt2)    
     ##############
     ##############
     ##############    
@@ -612,8 +659,14 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     f_sigTT_pre.FixParameter(1, 0)
     f_sigTT_pre.FixParameter(2, 0)
     f_sigTT_pre.FixParameter(3, 0)
+    # Set range limit of used parameters
+    # Currently 10% range
+    f_sigTT_pre.SetParLimits(0, tt0-tt0*par_lim, tt0+tt0*par_lim)
+    #f_sigTT_pre.SetParLimits(1, tt1-tt1*par_lim, tt1+tt1*par_lim)
+    #f_sigTT_pre.SetParLimits(2, tt2-tt2*par_lim, tt2+tt2*par_lim)
+    #f_sigTT_pre.SetParLimits(3, tt3-tt3*par_lim, tt3+tt3*par_lim)
     # Fixing sigTT terms for testing
-    f_sigTT_pre.FixParameter(0, tt0)
+    #f_sigTT_pre.FixParameter(0, tt0)
     ##############
     ##############
     ##############    
@@ -675,8 +728,14 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
     f_sigTT.FixParameter(1, 0)
     f_sigTT.FixParameter(2, 0)
     f_sigTT.FixParameter(3, 0)
+    # Set range limit of used parameters
+    # Currently 10% range
+    f_sigTT.SetParLimits(0, tt0-tt0*par_lim, tt0+tt0*par_lim)
+    #f_sigTT.SetParLimits(1, tt1-tt1*par_lim, tt1+tt1*par_lim)
+    #f_sigTT.SetParLimits(2, tt2-tt2*par_lim, tt2+tt2*par_lim)
+    #f_sigTT.SetParLimits(3, tt3-tt3*par_lim, tt3+tt3*par_lim)    
     # Fixing sigTT terms for testing
-    f_sigTT.FixParameter(0, tt0)
+    #f_sigTT.FixParameter(0, tt0)
     ##############
     ##############
     ##############    
@@ -739,11 +798,9 @@ def single_setting(ParticleType, pol_str, dir_iter, q2_set, w_set, tmin_range, t
         if old != new:
             print("par{} changed from {:.3f} to {:.3f}".format(i+1, old, new))
 
-    #'''
     para_file_out = "{}/src/{}/parameters/par.{}_Q{}W{}.dat".format(LTANAPATH, ParticleType, pol_str, q2_set.replace("p",""), w_set.replace("p",""))
     print("\nWriting {}...".format(para_file_out))
     with open(para_file_out, 'w') as f:
         for i in range(len(par_vec)):
-            f.write("{:13.5e} {:13.5e} {:3d} {:12.1f}\n".format(par_vec[i], par_err_vec[i], i, par_chi2_vec[i]))
-            print("  {:.3f} {:.3f} {:.1f} {:.1f}".format(par_vec[i], par_err_vec[i], i, par_chi2_vec[i]))
-    #'''
+            f.write("{:13.5e} {:13.5e} {:3d} {:12.1f}\n".format(par_vec[i], par_err_vec[i], i+1, par_chi2_vec[i]))
+            print("  {:.3f} {:.3f} {:.1f} {:.1f}".format(par_vec[i], par_err_vec[i], i+1, par_chi2_vec[i]))

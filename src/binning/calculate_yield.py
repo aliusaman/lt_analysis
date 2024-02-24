@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2024-02-19 15:23:49 trottar"
+# Time-stamp: "2024-02-22 19:18:22 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -413,9 +413,6 @@ def calculate_yield_data(kin_type, hist, t_bins, phi_bins, inpDict):
     tree_data, tree_dummy = hist["InFile_DATA"], hist["InFile_DUMMY"]
     nWindows, normfac_data, normfac_dummy = hist["nWindows"], hist["normfac_data"], hist["normfac_dummy"]
 
-    # Total number of events selected for setting
-    NumEvts_MM_DATA = hist["NumEvts_MM_DATA"]
-
     # Grab the setting by setting normalized error
     data_charge_err = inpDict["data_charge_err_{}".format(hist["phi_setting"].lower())] 
     
@@ -522,7 +519,7 @@ def find_yield_data(histlist, inpDict):
 
 ##################################################################################################################################################
 
-def process_hist_simc(tree_simc, t_bins, phi_bins, inpDict, iter_file=""):
+def process_hist_simc(tree_simc, t_bins, phi_bins, inpDict, iteration):
 
     processed_dict = {}
     
@@ -550,12 +547,6 @@ def process_hist_simc(tree_simc, t_bins, phi_bins, inpDict, iter_file=""):
         hgcer_cutg = apply_HGCer_hole_cut(Q2, W, EPSSET, simc=True)
         
     ################################################################################################################################################
-
-    if iter_file != "":
-        iteration = True
-        tree_simc = iter_file
-    else:
-        iteration = False
         
     TBRANCH_SIMC  = tree_simc.Get("h10")
 
@@ -618,9 +609,9 @@ def process_hist_simc(tree_simc, t_bins, phi_bins, inpDict, iter_file=""):
     
     return processed_dict
 
-def bin_simc(kin_type, tree_simc, t_bins, phi_bins, inpDict, iter_file=""):
+def bin_simc(kin_type, tree_simc, t_bins, phi_bins, inpDict, iteration):
 
-    processed_dict = process_hist_simc(tree_simc, t_bins, phi_bins, inpDict, iter_file="")
+    processed_dict = process_hist_simc(tree_simc, t_bins, phi_bins, inpDict, iteration)
     
     binned_dict = {}
 
@@ -668,15 +659,12 @@ def bin_simc(kin_type, tree_simc, t_bins, phi_bins, inpDict, iter_file=""):
         
     return binned_dict
 
-def calculate_yield_simc(kin_type, hist, t_bins, phi_bins, inpDict, iter_file=""):
+def calculate_yield_simc(kin_type, hist, t_bins, phi_bins, inpDict, iteration):
 
     tree_simc, normfac_simc = hist["InFile_SIMC"], hist["normfac_simc"]
-
-    # Total number of events selected for setting
-    NumEvts_MM_SIMC = hist["NumEvts_MM_SIMC"]    
     
     # Initialize lists for binned_t_data, binned_hist_data
-    binned_dict = bin_simc(kin_type, tree_simc, t_bins, phi_bins, inpDict, iter_file="")
+    binned_dict = bin_simc(kin_type, tree_simc, t_bins, phi_bins, inpDict, iteration)
 
     binned_t_simc = binned_dict[kin_type]["binned_t_simc"]
     binned_hist_simc = binned_dict[kin_type]["binned_hist_simc"]
@@ -750,7 +738,7 @@ def calculate_yield_simc(kin_type, hist, t_bins, phi_bins, inpDict, iter_file=""
             
     return groups
 
-def find_yield_simc(histlist, inpDict, iter_file=""):
+def find_yield_simc(histlist, inpDict, iteration=False):
     
     for hist in histlist:
         t_bins = hist["t_bins"]
@@ -770,7 +758,7 @@ def find_yield_simc(histlist, inpDict, iter_file=""):
         print("-"*25)
         print("-"*25)
         yieldDict[hist["phi_setting"]] = {}
-        yieldDict[hist["phi_setting"]]["yield"] = calculate_yield_simc("yield", hist, t_bins, phi_bins, inpDict, iter_file="")
+        yieldDict[hist["phi_setting"]]["yield"] = calculate_yield_simc("yield", hist, t_bins, phi_bins, inpDict, iteration)
             
     return {"binned_SIMC" : yieldDict}
 
@@ -863,7 +851,7 @@ def grab_yield_data(histlist, phisetlist, inpDict):
         yieldDict[hist["phi_setting"]] = {}
         with open(f_yield, 'r') as f:
             lines = f.readlines()
-        dict_lst = []            
+        dict_lst = []
         for line in lines:
             line_lst = line.split(" ") # yield, yield_err, phibin, tbin
             yield_val = float(line_lst[0])
@@ -876,6 +864,7 @@ def grab_yield_data(histlist, phisetlist, inpDict):
             print("Data yield for t-bin {} phi-bin {}: {:.3e} +/- {:.3e}".format(tbin_index, phibin_index, yield_val, (yield_err_val)*yield_val))
             dict_lst.append((tbin_index, phibin_index, yield_val, yield_err_val))
 
+        dict_lst = sorted(dict_lst, key=lambda x: (x[0], x[1]))            
         # Group the tuples by the first two elements using defaultdict
         groups = defaultdict(list)
         for tup in dict_lst:

@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2024-02-22 16:55:05 trottar"
+# Time-stamp: "2024-02-24 14:42:17 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -53,11 +53,11 @@ grab_runs () {
 }
 
 # ONGOING
-#Q2="0p5"
-#W="2p40"
+Q2="0p5"
+W="2p40"
 # NEXT???
-Q2="2p1"
-W="2p95"
+#Q2="2p1"
+#W="2p95"
 # DONE
 #Q2="3p0"
 #W="3p14"
@@ -110,16 +110,13 @@ for t in "${TARGET[@]}"; do
 		    [Yy]* )
 			# Finds number of lines of inpFile
 			numlines=$(eval "wc -l < ${inpFile}")
-			i=0
 			# Loop through each number in the list
 			for number in "${numbers_to_match[@]}"
 			do
 			    echo
-			    echo "Run $(( ${i} + 2 ))/$(( ${numlines} + 1 ))"
 			    echo "Running ${number}"
 			    cd "${LTANAPATH}"
-			    ./applyCuts_Prod.sh -p ${EPS} ${PHISET} ${Q2} ${W} ${TARGET} ${number} pion
-			    i+=1
+			    ./applyCuts_Prod.sh -p ${EPS} ${p} ${Q2} ${W} ${TARGET} ${number} kaon
 			done
 			break ;;
 		    [Nn]* ) 

@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2024-02-17 16:30:53 trottar"
+# Time-stamp: "2024-02-24 14:05:50 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -94,6 +94,7 @@ def single_setting(q2_set, fn_lo, fn_hi):
     nhi = TNtuple("nhi", "nhi", "x/F:dx:x_mod:eps:theta:phi:t:t_min:w:Q2")
     nhi.ReadFile(fn_hi)
 
+    '''
     # Print values for nlo
     print("Values for nlo:")
     for evt in nlo:
@@ -107,6 +108,7 @@ def single_setting(q2_set, fn_lo, fn_hi):
         print("x: {}, dx: {}, x_mod: {}, eps: {}, theta: {}, phi: {}, t: {}, t_min: {}, w: {}, Q2: {}".format(
             evt.x, evt.dx, evt.x_mod, evt.eps, evt.theta, evt.phi, evt.t, evt.t_min, evt.w, evt.Q2
         ))
+    '''
     
     q2_list = []
     w_list = []
@@ -244,8 +246,8 @@ def single_setting(q2_set, fn_lo, fn_hi):
         fff2.SetParameter(0, 1)
         fff2.SetParLimits(0, 0, 20)
 
-        fff2.SetParameter(1, 10)
-        fff2.SetParLimits(1, 0, 200)
+        fff2.SetParameter(1, 1)
+        fff2.SetParLimits(1, 0, 20)
 
         # Fix parameter 2 and 3
         fff2.FixParameter(2, 0.0)

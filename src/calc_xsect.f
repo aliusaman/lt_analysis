@@ -226,16 +226,17 @@ c angle check
             write(61,40) x_real,dx_real,x_mod,eps_mod,
      *           th_mod*180./3.14159,phi*180./3.14159,tm,tm_min,w,q2
  40         format(3G15.5,f8.5,2f7.2,4f8.5)
-            
+
+            print *,""
             print *,"--------------"
             WRITE(*,*) 'phi (deg): ', phi*180./3.14159
+            print *,"--------------"
             print *,'it',it
             print *,'nt',nt            
             print *,'ip',ip
             print *,'nphi',nphi
             print *,'ratio',r
             print *,'dratio',dr
-            print *,""
             print *,"--------------"            
             print *,"xmodel inputs"
             print *,"--------------"
@@ -253,6 +254,7 @@ c angle check
             print *,"x_mod: ", x_mod
             print *,"x_real: ", x_real
             print *,"--------------"
+            print *,""
             
          end do                 !phi
 

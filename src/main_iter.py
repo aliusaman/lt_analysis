@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2024-02-22 16:43:26 trottar"
+# Time-stamp: "2024-02-23 19:09:44 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -131,45 +131,55 @@ print("\n\nThe last iteration was ",closest_date)
 # Save this as the directory to grab further information
 prev_iter_dir = "{}/{}/{}/Q{}W{}/{}".format(CACHEPATH,USER,ParticleType.lower(),Q2,W,closest_date)
 
-# Copy all files from previous iteration to OUTPATH to assure consistency
-# List all files in the source directory
-files = os.listdir(prev_iter_dir+'/averages/')
-for f in files:
-    print("Copying {} to {}".format(prev_iter_dir+'/averages/'+f, '{}/src/{}/averages/'.format(LTANAPATH, ParticleType)))
-    shutil.copy(prev_iter_dir+'/averages/'+f, '{}/src/{}/averages/'.format(LTANAPATH, ParticleType))
-files = os.listdir(prev_iter_dir+'/kindata/')
-for f in files:
-    print("Copying {} to {}".format(prev_iter_dir+'/kindata/'+f, '{}/src/{}/kindata/'.format(LTANAPATH, ParticleType)))
-    shutil.copy(prev_iter_dir+'/kindata/'+f, '{}/src/{}/kindata/'.format(LTANAPATH, ParticleType))
-files = os.listdir(prev_iter_dir+'/parameters/')
-for f in files:
-    print("Copying {} to {}".format(prev_iter_dir+'/parameters/'+f, '{}/src/{}/parameters/'.format(LTANAPATH, ParticleType)))
-    shutil.copy(prev_iter_dir+'/parameters/'+f, '{}/src/{}/parameters/'.format(LTANAPATH, ParticleType))
-files = os.listdir(prev_iter_dir+'/xsects/')
-for f in files:
-    print("Copying {} to {}".format(prev_iter_dir+'/xsects/'+f, '{}/src/{}/xsects/'.format(LTANAPATH, ParticleType)))
-    shutil.copy(prev_iter_dir+'/xsects/'+f, '{}/src/{}/xsects/'.format(LTANAPATH, ParticleType))
-files = os.listdir(prev_iter_dir+'/yields/')
-for f in files:
-    print("Copying {} to {}".format(prev_iter_dir+'/yields/'+f, '{}/src/{}/yields/'.format(LTANAPATH, ParticleType)))
-    shutil.copy(prev_iter_dir+'/yields/'+f, '{}/src/{}/yields/'.format(LTANAPATH, ParticleType))
-print("Copying {} to {}".format(prev_iter_dir+'/lt_2D_fit.py', '{}/src/models/lt_2D_fit.py'.format(LTANAPATH)))
-shutil.copy(prev_iter_dir+'/lt_2D_fit.py', '{}/src/models/lt_2D_fit.py'.format(LTANAPATH))
-print("Copying {} to {}".format(prev_iter_dir+'/lt_kaon_pl.py', '{}/src/models/lt_kaon_pl.py'.format(LTANAPATH)))
-shutil.copy(prev_iter_dir+'/lt_kaon_pl.py', '{}/src/models/lt_kaon_pl.py'.format(LTANAPATH))
-print("Copying {} to {}".format(prev_iter_dir+'/param_kaon_pl.py', '{}/src/models/param_kaon_pl.py'.format(LTANAPATH)))
-shutil.copy(prev_iter_dir+'/param_kaon_pl.py', '{}/src/models/param_kaon_pl.py'.format(LTANAPATH))
-print("Copying {} to {}".format(prev_iter_dir+'/xmodel_kaon_pl.f', '{}/src/models/xmodel_kaon_pl.f'.format(LTANAPATH)))
-shutil.copy(prev_iter_dir+'/xmodel_kaon_pl.f', '{}/src/models/xmodel_kaon_pl.f'.format(LTANAPATH))
-files = os.listdir(prev_iter_dir+'/root/')
-for f in files:
-    print("Copying {} to {}".format(prev_iter_dir+'/root/'+f, OUTPATH))
-    shutil.copy(prev_iter_dir+'/root/'+f, OUTPATH)
-files = os.listdir(prev_iter_dir+'/json/')
-for f in files:
-    print("Copying {} to {}".format(prev_iter_dir+'/json/'+f, OUTPATH))
-    shutil.copy(prev_iter_dir+'/json/'+f, OUTPATH)
+if not os.path.exists(prev_iter_dir):
+    print("\n\n\tERROR: {} does not exist...".format(prev_iter_dir))
+    sys.exit(2)    
 
+if EPSSET == "low":
+    # Copy all files from previous iteration to OUTPATH to assure consistency
+    # List all files in the source directory
+    files = os.listdir(prev_iter_dir+'/')
+    for f in files:
+        if ".txt" not in f and ".settings" not in f and not os.path.isdir(prev_iter_dir+'/'+f):
+            print("Copying {} to {}".format(prev_iter_dir+'/'+f, '{}/src/{}/'.format(LTANAPATH, ParticleType)))
+            shutil.copy(prev_iter_dir+'/'+f, '{}/src/{}/'.format(LTANAPATH, ParticleType))
+    files = os.listdir(prev_iter_dir+'/averages/')
+    for f in files:
+        print("Copying {} to {}".format(prev_iter_dir+'/averages/'+f, '{}/src/{}/averages/'.format(LTANAPATH, ParticleType)))
+        shutil.copy(prev_iter_dir+'/averages/'+f, '{}/src/{}/averages/'.format(LTANAPATH, ParticleType))
+    files = os.listdir(prev_iter_dir+'/kindata/')
+    for f in files:
+        print("Copying {} to {}".format(prev_iter_dir+'/kindata/'+f, '{}/src/{}/kindata/'.format(LTANAPATH, ParticleType)))
+        shutil.copy(prev_iter_dir+'/kindata/'+f, '{}/src/{}/kindata/'.format(LTANAPATH, ParticleType))
+    files = os.listdir(prev_iter_dir+'/parameters/')
+    for f in files:
+        print("Copying {} to {}".format(prev_iter_dir+'/parameters/'+f, '{}/src/{}/parameters/'.format(LTANAPATH, ParticleType)))
+        shutil.copy(prev_iter_dir+'/parameters/'+f, '{}/src/{}/parameters/'.format(LTANAPATH, ParticleType))
+    files = os.listdir(prev_iter_dir+'/xsects/')
+    for f in files:
+        print("Copying {} to {}".format(prev_iter_dir+'/xsects/'+f, '{}/src/{}/xsects/'.format(LTANAPATH, ParticleType)))
+        shutil.copy(prev_iter_dir+'/xsects/'+f, '{}/src/{}/xsects/'.format(LTANAPATH, ParticleType))
+    files = os.listdir(prev_iter_dir+'/yields/')
+    for f in files:
+        print("Copying {} to {}".format(prev_iter_dir+'/yields/'+f, '{}/src/{}/yields/'.format(LTANAPATH, ParticleType)))
+        shutil.copy(prev_iter_dir+'/yields/'+f, '{}/src/{}/yields/'.format(LTANAPATH, ParticleType))
+    print("Copying {} to {}".format(prev_iter_dir+'/lt_2D_fit.py', '{}/src/models/lt_2D_fit.py'.format(LTANAPATH)))
+    shutil.copy(prev_iter_dir+'/lt_2D_fit.py', '{}/src/models/lt_2D_fit.py'.format(LTANAPATH))
+    print("Copying {} to {}".format(prev_iter_dir+'/lt_kaon_pl.py', '{}/src/models/lt_kaon_pl.py'.format(LTANAPATH)))
+    shutil.copy(prev_iter_dir+'/lt_kaon_pl.py', '{}/src/models/lt_kaon_pl.py'.format(LTANAPATH))
+    print("Copying {} to {}".format(prev_iter_dir+'/param_kaon_pl.py', '{}/src/models/param_kaon_pl.py'.format(LTANAPATH)))
+    shutil.copy(prev_iter_dir+'/param_kaon_pl.py', '{}/src/models/param_kaon_pl.py'.format(LTANAPATH))
+    print("Copying {} to {}".format(prev_iter_dir+'/xmodel_kaon_pl.f', '{}/src/models/xmodel_kaon_pl.f'.format(LTANAPATH)))
+    shutil.copy(prev_iter_dir+'/xmodel_kaon_pl.f', '{}/src/models/xmodel_kaon_pl.f'.format(LTANAPATH))
+    files = os.listdir(prev_iter_dir+'/root/')
+    for f in files:
+        print("Copying {} to {}".format(prev_iter_dir+'/root/'+f, OUTPATH))
+        shutil.copy(prev_iter_dir+'/root/'+f, OUTPATH)
+    files = os.listdir(prev_iter_dir+'/json/')
+    for f in files:
+        print("Copying {} to {}".format(prev_iter_dir+'/json/'+f, OUTPATH))
+        shutil.copy(prev_iter_dir+'/json/'+f, OUTPATH)
+        
 prev_iter_root = foutroot.replace(OUTPATH,prev_iter_dir+"/root")
 prev_iter_json = foutjson.replace(OUTPATH,prev_iter_dir+"/json")
 
@@ -208,7 +218,6 @@ if EPSSET == "low":
 # ***Parameter file for new iteration!***
 # ***These parameters are newly generated for this iteration above. See README for more info on procedure!***
 new_param_file = '{}/src/{}/parameters/par.{}_Q{}W{}.dat'.format(LTANAPATH, ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""))
-output_file_lst.append(new_param_file)
 
 # Grab combined root files for data and dummy.
 # Then save to dictionary
@@ -231,7 +240,6 @@ prev_root_file = TFile.Open(prev_iter_root, "READ")
 # Grab weight from previous iteration
 for hist in histlist:
     hist.update(hist_in_dir(prev_root_file, "{}/data".format(hist["phi_setting"])))
-    hist.update(hist_in_dir(prev_root_file, "{}/simc".format(hist["phi_setting"])))
     hist.update(hist_in_dir(prev_root_file, "{}/dummy".format(hist["phi_setting"])))
     
 # t/phi bins are the same for all settings
@@ -241,6 +249,9 @@ phi_bins = np.array(histlist[0]["phi_bins"])
 
 sys.path.append("binning")
 from find_bins import find_bins, check_bins
+
+output_file_lst.append("{}/t_bin_interval_Q{}W{}".format(ParticleType, Q2.replace("p",""), W.replace("p","")))
+output_file_lst.append("{}/phi_bin_interval_Q{}W{}".format(ParticleType, Q2.replace("p",""), W.replace("p","")))
 
 #print("\n\nt_bins = ", t_bins)
 #print("phi_bins = ", phi_bins)
@@ -337,7 +348,9 @@ for hist in histlist:
             # Function to calculation new weight and apply it to simc root file 
             iter_weight(new_param_file, new_simc_root, inpDict, hist["phi_setting"])
             # Overwrite root file with updated weight
-            os.rename(new_simc_root.replace(".root","_new.root"),new_simc_root)
+            #os.rename(new_simc_root.replace(".root","_iter.root"),new_simc_root)
+            # Use newly created simc root and hist file
+            new_simc_root = new_simc_root.replace(".root","_iter.root")
             hist.update(compare_simc(new_simc_root, hist, inpDict))
         else:
             print("ERROR: {} not properly copied to {}".format(old_simc_root, new_simc_root))
@@ -398,11 +411,12 @@ output_file_lst.append(outputpdf)
 
 # ***Grabbing data yield and average values from previous iteration rather than rebinning***
 sys.path.append("binning")
-from calculate_yield import grab_yield_data, find_yield_simc
+from calculate_yield import grab_yield_data, find_yield_simc, find_yield_data
 
 yieldDict = {}
-yieldDict.update(grab_yield_data(histlist, phisetlist, inpDict))
-yieldDict.update(find_yield_simc(histlist, inpDict, iter_file=new_simc_root))
+#yieldDict.update(grab_yield_data(histlist, phisetlist, inpDict))
+yieldDict.update(find_yield_data(histlist, inpDict))
+yieldDict.update(find_yield_simc(histlist, inpDict, iteration=True))
 
 sys.path.append("binning")
 from calculate_ratio import find_ratio
@@ -411,11 +425,12 @@ ratioDict = {}
 ratioDict.update(find_ratio(histlist, inpDict, yieldDict))
 
 sys.path.append("binning")
-from ave_per_bin import grab_ave_data, ave_per_bin_simc
+from ave_per_bin import grab_ave_data, ave_per_bin_simc, ave_per_bin_data
 
 aveDict = {}
-aveDict.update(grab_ave_data(histlist, inpDict))
-aveDict.update(ave_per_bin_simc(histlist, inpDict, iter_file=new_simc_root))
+#aveDict.update(grab_ave_data(histlist, inpDict))
+aveDict.update(ave_per_bin_data(histlist, inpDict))
+aveDict.update(ave_per_bin_simc(histlist, inpDict, iteration=True))
 
 sys.path.append("plotting")
 from binned import plot_binned
@@ -434,8 +449,6 @@ for hist in histlist:
     for i, (key, val) in enumerate(hist.items()):
         # Progress bar
         Misc.progressBar(i, len(hist.items())-1,bar_length=25)
-        if "G_data_eff" in key:
-            hist_to_root(val, foutroot, "{}/data".format(hist["phi_setting"]))            
         if is_hist(val):
             if "ratio" in key:
                 continue
@@ -553,8 +566,11 @@ if EPSSET == "high":
         show_pdf_with_evince(OUTPATH+"/{}_xsects_Q{}W{}.pdf".format(ParticleType, Q2, W))        
     output_file_lst.append(OUTPATH+"/{}_xsects_Q{}W{}.pdf".format(ParticleType, Q2, W))
     output_file_lst.append(OUTPATH+"/{}_lt_fit_Q{}W{}.pdf".format(ParticleType, Q2, W))
+    output_file_lst.append('models/lt_2D_fit.py')
     
     # Save sep and unsep values from current iteration
+    new_param_file = '{}/parameters/par.{}_Q{}W{}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""))
+    output_file_lst.append(new_param_file) 
     sep_file = '{}/xsects/x_sep.{}_Q{}W{}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""))
     output_file_lst.append(sep_file)
     unsep_lo_file = '{}/xsects/x_unsep.{}_Q{}W{}_{:.0f}.dat'.format(ParticleType, pol_str, Q2.replace("p",""), W.replace("p",""), float(LOEPS)*100)

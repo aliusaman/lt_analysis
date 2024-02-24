@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2024-02-06 02:03:56 trottar"
+# Time-stamp: "2024-02-22 18:32:26 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -98,9 +98,7 @@ def plot_iteration(histlist, phisetlist, inpDict):
     
     for hist in histlist_copy:
 
-        tree_simc = hist["InFile_SIMC"]
-
-        TBRANCH_SIMC  = tree_simc.Get("h10")
+        TBRANCH_SIMC  = hist["InFile_SIMC"].Get("h10")
 
         hist["H_Weight_SIMC"] = TH1D("H_Weight_SIMC", "Simc Weight", 100, 0, 1e-5)
         hist["H_hsdelta_SIMC"] = TH1D("H_hsdelta_SIMC","HMS Delta", 100, -20.0, 20.0)

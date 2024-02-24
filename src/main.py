@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2024-02-21 13:27:58 trottar"
+# Time-stamp: "2024-02-23 17:56:21 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -377,6 +377,7 @@ if EPSSET == "low":
     bin_vals = find_bins(histlist, inpDict)
 
 try:
+    output_file_lst.append("{}/t_bin_interval_Q{}W{}".format(ParticleType, Q2.replace("p",""), W.replace("p","")))
     with open("{}/src/{}/t_bin_interval_Q{}W{}".format(LTANAPATH, ParticleType, Q2.replace("p",""), W.replace("p","")), "r") as file:
         # Read all lines from the file into a list
         all_lines = file.readlines()
@@ -392,6 +393,7 @@ except IOError:
     print("Error reading {}...".format("{}/src/{}/t_bin_interval_Q{}W{}".format(LTANAPATH, ParticleType, Q2.replace("p",""), W.replace("p",""))))    
 
 try:
+    output_file_lst.append("{}/phi_bin_interval_Q{}W{}".format(ParticleType, Q2.replace("p",""), W.replace("p","")))
     with open("{}/src/{}/phi_bin_interval_Q{}W{}".format(LTANAPATH, ParticleType, Q2.replace("p",""), W.replace("p","")), "r") as file:
         # Read all lines from the file into a list
         all_lines = file.readlines()
@@ -532,8 +534,15 @@ if not os.path.exists(foutroot):
             if "G_data_eff" in key:
                 hist_to_root(val, foutroot, "{}/data".format(hist["phi_setting"]))
             if is_hist(val):
-                if "ratio" in key:
-                    continue
+                if "SIMC" in key:
+                    if "yield" in key:
+                        continue
+                    elif "bin" in key:
+                        continue
+                    elif "totevts" in key:
+                        continue
+                    else:
+                        hist_to_root(val, foutroot, "{}/simc".format(hist["phi_setting"]))                
                 if "DATA" in key:
                     if "yield" in key:
                         continue
@@ -543,15 +552,6 @@ if not os.path.exists(foutroot):
                         continue
                     else:
                         hist_to_root(val, foutroot, "{}/data".format(hist["phi_setting"]))
-                if "SIMC" in key:
-                    if "yield" in key:
-                        continue
-                    elif "bin" in key:
-                        continue
-                    elif "totevts" in key:
-                        continue
-                    else:
-                        hist_to_root(val, foutroot, "{}/simc".format(hist["phi_setting"]))
                 if "DUMMY" in key:
                     hist_to_root(val, foutroot, "{}/dummy".format(hist["phi_setting"]))
 
@@ -565,6 +565,8 @@ if not os.path.exists(foutroot):
         print("\nThe root file {} has been successfully closed.".format(foutroot))
     else:
         print("\nError: Unable to close the root file {}.".format(foutroot))
+        
+# Add root file with data histograms        
 output_file_lst.append(foutroot)
 
 # Check that root file doesnt already exist
@@ -751,12 +753,18 @@ for f in output_file_lst:
     elif "{}/".format(ParticleType) in f:
         f_arr = f.split("/")
         f_tmp = f_arr.pop()
-        for f_dir in f_arr:
-            if "{}".format(ParticleType) not in f_dir:
-                create_dir(new_dir+"/"+f_dir)
-                f_new = new_dir+"/"+f_dir+"/"+f_tmp    
-                print("Copying {} to {}".format(LTANAPATH+"/src/"+f,f_new))
-                shutil.copy(LTANAPATH+"/src/"+f, f_new)
+        print("!!!!!!!!!!!!!!!",f_arr, f_tmp)
+        if len(f_arr) > 1:
+            for f_dir in f_arr:
+                if "{}".format(ParticleType) not in f_dir:
+                    create_dir(new_dir+"/"+f_dir)
+                    f_new = new_dir+"/"+f_dir+"/"+f_tmp    
+                    print("Copying {} to {}".format(LTANAPATH+"/src/"+f,f_new))
+                    shutil.copy(LTANAPATH+"/src/"+f, f_new)
+        else:
+            f_new = new_dir+"/"+f_tmp
+            print("Copying {} to {}".format(LTANAPATH+"/src/"+f,f_new))
+            shutil.copy(LTANAPATH+"/src/"+f, f_new)
     else:
         f_new = new_dir
         print("Copying {} to {}".format(LTANAPATH+"/src/"+f,f_new))
