@@ -118,7 +118,7 @@ for t in "${TARGET[@]}"; do
 			    echo "Run $(( ${i} + 2 ))/$(( ${numlines} + 1 ))"
 			    echo "Running ${number}"
 			    cd "${LTANAPATH}"
-			    ./applyCuts_Prod.sh -p ${EPS} ${PHISET} ${Q2} ${W} ${TARGET} ${number} kaon
+			    ./applyCuts_Prod.sh -p ${EPS} ${PHISET} ${Q2} ${W} ${TARGET} ${number} pion
 			    i+=1
 			done
 			break ;;
