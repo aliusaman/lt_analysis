@@ -1121,7 +1121,6 @@ if [[ $i_flag != "true" ]]; then
 	if [[ ${#data_left_tmp[@]} -ne 0 ]]; then
 	    echo
 	    echo "Calculating data total effective charge left..."
-	    python3 findEffectiveCharge.py ${EffData} "${data_left_tmp[*]}" ${ParticleType}
 	    PYLEFTSTRING=$(python3 findEffectiveCharge.py ${EffData} "${data_left_tmp[*]}" ${ParticleType})
 	    arr1=()
 	    arr2=()
@@ -1145,14 +1144,6 @@ if [[ $i_flag != "true" ]]; then
 	    DatapThetaValLeft=("${arr5[@]}")
 	    DataEbeamValLeft=("${arr6[@]}")
 	    data_left=("${arr7[@]}")
-
-		echo "array1 : [${arr1[@]}]"
-		echo "array2 : [${arr2[@]}]"
-		echo "array3 : [${arr3[@]}]"
-		echo "array4 : [${arr4[@]}]"
-		echo "array5 : [${arr5[@]}]"
-		echo "array6 : [${arr6[@]}]"
-		echo "array7 : [${arr7[@]}]"
 
 	    if [ "${#data_left_tmp[@]}" -ne "${#data_left[@]}" ]; then
 		echo "Removing bad left data runs..."

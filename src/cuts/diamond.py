@@ -42,7 +42,7 @@ UTILPATH=lt.UTILPATH
 LTANAPATH=lt.LTANAPATH
 ANATYPE=lt.ANATYPE
 OUTPATH=lt.OUTPATH
-
+print(OUTPATH)
 ################################################################################################################################################
 # Suppressing the terminal splash of Print()
 ROOT.gROOT.ProcessLine("gErrorIgnoreLevel = kError;")
